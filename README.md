@@ -27,6 +27,26 @@ python3 install_dependencies.py
 
 ## Run Test
 
+### Basic Test
+
 ```bash
 python3 run_test.py
+```
+
+### GDV Detection Test
+
+```bash
+python3 main.py -f test -g -t
+```
+
+### Dataflow Analysis Test (WIP)
+
+```bash
+python3 main.py -s -t
+```
+
+### Entry Point Detection Test (WIP)
+
+```bash
+python3 main.py -f test -e -t
 ```
