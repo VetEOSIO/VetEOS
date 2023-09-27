@@ -1,1 +1,0 @@
-The PDF file shows the WASM instructions of the function `void reveal(eosio::name username, std::string user_input)` in the file `motivate.cpp`.
