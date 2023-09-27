@@ -18,3 +18,15 @@ In a Groundhog Day attack, adversaries can exploit the unique rollback problem i
 - wasm
 - graphviz
 - timeout-decorator
+
+## Install Dependencies
+
+```bash
+python3 install_dependencies.py
+```
+
+## Run Test
+
+```bash
+python3 run_test.py
+```
