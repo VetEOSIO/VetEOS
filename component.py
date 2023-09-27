@@ -813,17 +813,17 @@ class ComGraph:
         t4 = 'writeState'
         t5 = 'notify'
         t6 = 'readState'
-        n1 = self.str2html(self.pay2play_wp(), 'payToPlay')
+        n1 = self.str2html(self.pay2play_wp(), t1)
         # print(n1)
-        n2 = self.str2html(self.checkCondition_wp(), 'checkCondition')
+        n2 = self.str2html(self.checkCondition_wp(), t2)
         n3 = self.createSecret_wp()
 
         n6, n4, secret = self.stateIO_wp()
         n3 = secret if n3 == 'None' else n3
-        n3 = self.str2html(n3, 'createSecret')
-        n4 = self.str2html(n4, 'writeState')
-        n6 = self.str2html(n6, 'readState')
-        n5 = self.str2html(self.notify_wp(), 'notify')
+        n3 = self.str2html(n3, t3)
+        n4 = self.str2html(n4, t4)
+        n6 = self.str2html(n6, t6)
+        n5 = self.str2html(self.notify_wp(), t5)
         if filename == None:
             viz()
         else:
