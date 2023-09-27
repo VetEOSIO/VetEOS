@@ -1,7 +1,7 @@
 from octopus.arch.wasm.cfg import Function
-from instruction import VetInstruction
-from node import Node
-from utils import *
+from veteos.instruction import VetInstruction
+from veteos.node import Node
+from veteos.utils import *
 
 
 class VetFunction(Function):

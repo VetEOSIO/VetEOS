@@ -1,7 +1,7 @@
 from octopus.arch.wasm.emulator import WasmSSAEmulatorEngine
-from function import VetFunction
-from core import Func
-from utils import *
+from veteos.function import VetFunction
+from veteos.core import Func
+from veteos.utils import *
 
 
 class Contract:

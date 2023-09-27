@@ -1,4 +1,4 @@
-from core import *
+from veteos.core import *
 import pprint
 
 

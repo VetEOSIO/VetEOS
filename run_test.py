@@ -1,5 +1,5 @@
-from core import *
-from component import *
+from veteos.core import *
+from veteos.component import *
 
 def test():
     filename='examples/gamble.wasm'

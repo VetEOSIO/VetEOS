@@ -1,7 +1,7 @@
 from octopus.arch.wasm.emulator import WasmSSAEmulatorEngine as WE
 
 
-from utils import *
+from veteos.utils import *
 import timeout_decorator
 
 

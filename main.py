@@ -17,11 +17,9 @@ def main():
         print("File path:", args.file)
         if args.graph:
             graph=True
-    else:
-        print("No file path specified.")
 
     if not args.file and args.terminal:
-        from terminal import Terminal
+        from veteos.terminal import Terminal
         Terminal().run()
 
     if not args.file and not args.terminal:

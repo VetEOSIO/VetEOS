@@ -1,6 +1,6 @@
 # from core import *
-from terminal import *
-from misc import *
+from veteos.terminal import *
+from veteos.misc import *
 
 
 class Component:
@@ -751,7 +751,7 @@ class ComGraph:
             return rdd[rddk[0]]+'\l', wtd[wtdk[0]]+'\l', wtd[secret]+'\l'
 
     def component_viz(self, filename=None):
-        def viz(filename='componentviz.gv', TB=True):
+        def viz(filename='summary.gv', TB=True):
             from graphviz import Digraph
 
             def T1():
@@ -824,10 +824,14 @@ class ComGraph:
         n4 = self.str2html(n4, t4)
         n6 = self.str2html(n6, t6)
         n5 = self.str2html(self.notify_wp(), t5)
+        
+        result_dir = 'results'
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
+        
         if filename == None:
-            viz()
-        else:
-            viz(filename)
+            filename=self.emul.filename.split(os.path.sep)[-1]
+        viz(os.path.join(result_dir,filename+'.gv'))
         return
 
 
