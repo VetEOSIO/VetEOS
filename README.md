@@ -113,7 +113,7 @@ Detected Groundhog Day Vulnerabilities: 24
 Results are stored in ./results/
 ```
 
-- The logs and generated analysis summary graphs will be stored in `./results`.
+- The logs and generated analysis summary graphs will be stored in `./results/`.
 
 - Example of analysis log: [./results/example.log](./results/example.log)
 
@@ -121,8 +121,12 @@ Results are stored in ./results/
 
   ![analysis summary graph](results/example.png)
 
-### Dataflow Analysis Test (WIP)
+### Dataflow Analysis Test
 
 ```bash
 bash tests/test_dataflow.sh
 ```
+
+Expected Results:
+
+You will see a process of automatic dataflow tracking testing through the VetEOS terminal. Example output: [./results/example_output_dataflow_test.log](./results/example_output_dataflow_test.log)

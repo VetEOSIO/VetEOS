@@ -293,15 +293,23 @@ class Terminal():
                 return False
             return True
 
+        def myinput(prompt=''):
+            res = input(prompt)
+            if not isatty:
+                print(res)
+            return res
+
         PROMPT = self.set_color('VetEOS> ', 'b', True)
         ERROR = self.set_color('Error: ', 'r', True)
         WARNING = self.set_color('Warning: ', 'y', True)
         emul = None
         func = None
         ins = []
+        import sys
+        isatty = sys.stdin.isatty()
         # main loop
         while True:
-            s = input(PROMPT)
+            s = myinput(PROMPT)
             if s.lower() in ['q', 'exit']:
                 break
 
@@ -309,7 +317,7 @@ class Terminal():
                 self.test()
 
             elif s == 'load':
-                filename = input('Please input file path: ')
+                filename = myinput('Please input file path: ')
                 try:
                     emul = Contract(filename)
                 except:
@@ -328,7 +336,7 @@ class Terminal():
                 func_name = ''
                 # if the input is 'f'
                 if len(s.split()) == 1:
-                    func_name = input('Function name: ').strip()
+                    func_name = myinput('Function name: ').strip()
                 else:
                     func_name = s.replace('f ', '').strip()
                 if len(func_name.split()) > 1:
@@ -350,7 +358,7 @@ class Terminal():
                 i_offset = ''
                 # if the input is 'i'
                 if len(s.split()) == 1:
-                    i_offset = input('Instruction offset: ').strip()
+                    i_offset = myinput('Instruction offset: ').strip()
                 else:
                     i_offset = s.replace('i ', '').strip()
                 input_ins = i_offset.split()
