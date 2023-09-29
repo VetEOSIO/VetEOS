@@ -83,7 +83,7 @@ bash tests/test_GDV.sh
 
 Expected Results:
 
-```bash
+```
 Analyzing file: samples/127922358_8_0.wasm
 Analyzing file: samples/127926023_31_0.wasm
 Analyzing file: samples/127926269_6_0.wasm
@@ -129,4 +129,5 @@ bash tests/test_dataflow.sh
 
 Expected Results:
 
-You will see a process of automatic dataflow tracking testing through the VetEOS terminal. Example output: [./results/example_output_dataflow_test.log](./results/example_output_dataflow_test.log)
+- You will see a process of automatic dataflow tracking testing through the VetEOS terminal.
+- Example output: [./results/example_output_dataflow_test.log](./results/example_output_dataflow_test.log)
