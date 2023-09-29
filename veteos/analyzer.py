@@ -3,7 +3,7 @@ from veteos.terminal import *
 from veteos.misc import *
 
 
-class Component:
+class Analyzer:
     def ins2str(ins: Instruction, target: str = None):
         def add_note(itp: str):
             if '6138663591592764928' in itp:
@@ -21,7 +21,7 @@ class Component:
             elif 'i64.const' in itp:
                 itp += ' ("%s")' % eosio_name_decoder(int(itp.split()[-1]))
             # convert to html
-            return itp.replace('(', '&lt;').replace(')', '&gt;')
+            return itp.replace('(', '<').replace(')', '>')
         itp = get_ins_interpretation(ins)
         itp = add_note(itp)
         return str(ins.offset)+': '+itp
@@ -41,7 +41,7 @@ class Component:
                     if index_only:
                         return idx
                     tmp = [
-                        funcname+':'+Component.ins2str(i, tarname) for i in instrs[max(idx-4, 0):idx+1]]
+                        funcname+':'+Analyzer.ins2str(i, tarname) for i in instrs[max(idx-4, 0):idx+1]]
                     if full:
                         res.append(tmp)
                     else:
@@ -66,14 +66,14 @@ class Component:
                     if is_cmp_ins(instrs[idx+1].name):
                         left, right = max(left-1, 0), right-1
                     res['eosio.token'] = [
-                        funcname+':' + Component.ins2str(i, funcname) for i in instrs[left:right]]
+                        funcname+':' + Analyzer.ins2str(i, funcname) for i in instrs[left:right]]
                 if not transfer and ins.operand == Const.TRANSFER:
                     transfer = True
                     left, right = idx, min(idx+4, len(instrs))
                     if is_cmp_ins(instrs[idx+1].name):
                         left, right = max(left-1, 0), right-1
                     res['transfer'] = [
-                        funcname+':'+Component.ins2str(i, funcname) for i in instrs[left:right]]
+                        funcname+':'+Analyzer.ins2str(i, funcname) for i in instrs[left:right]]
                 if eosio_token and transfer:
                     return res
         return None
@@ -99,15 +99,15 @@ class Component:
                         if not eosio_token and ins.operand == Const.EOSIO_TOKEN:
                             eosio_token = True
                             res['eosio.token'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[idx:idx+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[idx:idx+2]]
                         if not transfer and ins.operand == Const.TRANSFER:
                             transfer = True
                             res['transfer'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[idx:idx+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[idx:idx+2]]
                         if not active and ins.operand == Const.ACTIVE:
                             active = True
                             res['active'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[idx:idx+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[idx:idx+2]]
                         if eosio_token and transfer and active:
                             return res
                 return None
@@ -121,7 +121,7 @@ class Component:
                     func = emul.get_function(func_name)
                     res = find_strings(func)
                     if res != None:
-                        res['inline'] = Component.find_call_ins(
+                        res['inline'] = Analyzer.find_call_ins(
                             emul, ac[-2], target)[-4:]
                         return res
                     idx -= 1
@@ -132,7 +132,7 @@ class Component:
         reci = emul.get_call_edges_to(receipt)
         if reci != None:
             for rc in reci:
-                rc_ins = Component.find_call_ins(emul, rc, receipt)[-2:]
+                rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
                 res[receipt].append(rc_ins)
         inline = inline_eos_trans(emul)
         res['eosio.token::transfer'] = inline
@@ -187,7 +187,7 @@ class Component:
                     dbfs = find_func_from_tree_new(
                         emul, dbfind, cmp=lambda _, k: 'db_' in k and 'find_i' in k)
                     dbf = dbfs[0]  # select the first chain
-                    tmp[dbfind] = Component.find_call_ins(
+                    tmp[dbfind] = Analyzer.find_call_ins(
                         emul, dbf[-2], 'find_i')
                     if len(dbfs) == 0:  # 'db_find' not found, to find other finding APIs
                         dbfs = find_func_from_tree_new(
@@ -195,22 +195,22 @@ class Component:
                         if len(dbfs) == 0:
                             continue
                         dbf = dbfs[0]  # select the first chain
-                        tmp[dbfind] = Component.find_call_ins(
+                        tmp[dbfind] = Analyzer.find_call_ins(
                             emul, dbf[-2], dbfind)
                 else:
                     caller, callee = find_caller_callee(ac, idx)
                     caller, callee = ac[caller], ac[callee]
                     # print(caller,callee)
                     # print(ac)
-                    idx_cget = Component.find_call_ins(
+                    idx_cget = Analyzer.find_call_ins(
                         emul, caller, callee, index_only=True)
-                    tmp[dbfind] = Component.find_call_ins(
+                    tmp[dbfind] = Analyzer.find_call_ins(
                         emul, caller, dbfind, reverse=True, start_index=idx_cget)
                     if tmp[dbfind] == None:
-                        tmp[dbfind] = Component.find_call_ins(
+                        tmp[dbfind] = Analyzer.find_call_ins(
                             emul, caller, dbfind)
                     # tmp[dbfind]=Component.find_call_ins(emul,caller,dbfind,full=True)
-                tmp[dbget] = Component.find_call_ins(
+                tmp[dbget] = Analyzer.find_call_ins(
                     emul, ac[find_caller(ac, len(ac)-1)], dbget)[-1]
                 if not full and tmp[dbget] != None:
                     return tmp
@@ -271,7 +271,7 @@ class Component:
                             tmps = ' <user input>'
                         elif idxx < 2:
                             tmps = ' <global state>'
-                        res.append(ac+':'+Component.ins2str(inss)+tmps)
+                        res.append(ac+':'+Analyzer.ins2str(inss)+tmps)
                     return res
         return None
 
@@ -288,12 +288,12 @@ class Component:
             # tmp_idx=0
             for i in func.instructions:
                 if '.rem_' in i.name:
-                    tmp = [funcname+':'+Component.ins2str(i)]
+                    tmp = [funcname+':'+Analyzer.ins2str(i)]
                     # tmp_idx=0
                 elif len(tmp) == 1 and ('set' in i.name or 'store' in i.name):
                     # if tmp_idx>3: # threshold
                     #     continue
-                    tmp.append(funcname+':'+Component.ins2str(i))
+                    tmp.append(funcname+':'+Analyzer.ins2str(i))
                     if not full:
                         return tmp
                     res.append(tmp)
@@ -309,7 +309,7 @@ class Component:
         return None
 
 
-class Component_ssa:
+class Analyzerssa:
     def ins_preprocess(func: Func, left, right):
         for i in range(left, right):
             ins = func.func.instructions[i]
@@ -359,7 +359,7 @@ class Component_ssa:
                     if index_only:
                         return idx
                     tmp = [
-                        funcname+':'+Component.ins2str(i, tarname) for i in instrs[max(idx-4, 0):idx+1]]
+                        funcname+':'+Analyzer.ins2str(i, tarname) for i in instrs[max(idx-4, 0):idx+1]]
                     if full:
                         res.append(tmp)
                     else:
@@ -390,7 +390,7 @@ class Component_ssa:
                         left, right = max(left-1, 0), right-1
                     # res['eosio.token']=[funcname+':'+ Component.ins2str(i,funcname) for i in Component.ins_preprocess(app,left,right)]
                     res['eosio.token'] = [
-                        funcname+':' + Component.ins2str(i, funcname) for i in instrs[left:right]]
+                        funcname+':' + Analyzer.ins2str(i, funcname) for i in instrs[left:right]]
                 if not transfer and ins.operand == Const.TRANSFER:
                     transfer = True
                     left, right = idx, min(idx+4, len(instrs))
@@ -398,7 +398,7 @@ class Component_ssa:
                         left, right = max(left-1, 0), right-1
                     # res['transfer']=[funcname+':'+Component.ins2str(i,funcname) for i in Component.ins_preprocess(app,left,right)]
                     res['transfer'] = [
-                        funcname+':'+Component.ins2str(i, funcname) for i in instrs[left:right]]
+                        funcname+':'+Analyzer.ins2str(i, funcname) for i in instrs[left:right]]
                 if eosio_token and transfer:
                     return res
         return None
@@ -439,11 +439,11 @@ class Component_ssa:
                             except:
                                 instrs = func.instructions
                             res['eosio.token'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[id1:id1+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[id1:id1+2]]
                             res['transfer'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[id2:id2+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[id2:id2+2]]
                             res['active'] = [
-                                funcname+':'+Component.ins2str(i, target) for i in instrs[id3:id3+2]]
+                                funcname+':'+Analyzer.ins2str(i, target) for i in instrs[id3:id3+2]]
                             return res
                 return None
 
@@ -456,7 +456,7 @@ class Component_ssa:
                     func = emul.get_function(func_name)
                     res = find_strings(func)
                     if res != None:
-                        res['inline'] = Component.find_call_ins(
+                        res['inline'] = Analyzer.find_call_ins(
                             emul, ac[-2], target)[-4:]
                         return res
                     idx -= 1
@@ -467,7 +467,7 @@ class Component_ssa:
         reci = emul.get_call_edges_to(receipt)
         if reci != None:
             for rc in reci:
-                rc_ins = Component.find_call_ins(emul, rc, receipt)[-2:]
+                rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
                 res[receipt].append(rc_ins)
         inline = inline_eos_trans(emul)
         res['eosio.token::transfer'] = inline
@@ -522,7 +522,7 @@ class Component_ssa:
                     dbfs = find_func_from_tree_new(
                         emul, dbfind, cmp=lambda _, k: 'db_' in k and 'find_i' in k)
                     dbf = dbfs[0]  # select the first chain
-                    tmp[dbfind] = Component.find_call_ins(
+                    tmp[dbfind] = Analyzer.find_call_ins(
                         emul, dbf[-2], 'find_i')
                     if len(dbfs) == 0:  # 'db_find' not found, to find other finding APIs
                         dbfs = find_func_from_tree_new(
@@ -530,22 +530,22 @@ class Component_ssa:
                         if len(dbfs) == 0:
                             continue
                         dbf = dbfs[0]  # select the first chain
-                        tmp[dbfind] = Component.find_call_ins(
+                        tmp[dbfind] = Analyzer.find_call_ins(
                             emul, dbf[-2], dbfind)
                 else:
                     caller, callee = find_caller_callee(ac, idx)
                     caller, callee = ac[caller], ac[callee]
                     # print(caller,callee)
                     # print(ac)
-                    idx_cget = Component.find_call_ins(
+                    idx_cget = Analyzer.find_call_ins(
                         emul, caller, callee, index_only=True)
-                    tmp[dbfind] = Component.find_call_ins(
+                    tmp[dbfind] = Analyzer.find_call_ins(
                         emul, caller, dbfind, reverse=True, start_index=idx_cget)
                     if tmp[dbfind] == None:
-                        tmp[dbfind] = Component.find_call_ins(
+                        tmp[dbfind] = Analyzer.find_call_ins(
                             emul, caller, dbfind)
                     # tmp[dbfind]=Component.find_call_ins(emul,caller,dbfind,full=True)
-                tmp[dbget] = Component.find_call_ins(
+                tmp[dbget] = Analyzer.find_call_ins(
                     emul, ac[find_caller(ac, len(ac)-1)], dbget)[-1]
                 if not full and tmp[dbget] != None:
                     return tmp
@@ -612,7 +612,7 @@ class Component_ssa:
                             tmps = ' <user input>'
                         elif idxx < 2:
                             tmps = ' <global state>'
-                        res.append(ac+':'+Component.ins2str(inss)+tmps)
+                        res.append(ac+':'+Analyzer.ins2str(inss)+tmps)
                     return res
         return None
 
@@ -633,12 +633,12 @@ class Component_ssa:
             # tmp_idx=0
             for i in func.instructions:
                 if '.rem_' in i.name:
-                    tmp = [funcname+':'+Component.ins2str(i)]
+                    tmp = [funcname+':'+Analyzer.ins2str(i)]
                     # tmp_idx=0
                 elif len(tmp) == 1 and ('set' in i.name or 'store' in i.name):
                     # if tmp_idx>3: # threshold
                     #     continue
-                    tmp.append(funcname+':'+Component.ins2str(i))
+                    tmp.append(funcname+':'+Analyzer.ins2str(i))
                     if not full:
                         return tmp
                     res.append(tmp)
@@ -654,7 +654,7 @@ class Component_ssa:
         return None
 
 
-class ComGraph:
+class Solver:
     def __init__(self, emul: Contract) -> None:
         self.emul = emul
 
@@ -674,27 +674,27 @@ class ComGraph:
            .replace('&lt;', '</font><font point-size="%d" color="orange">&lt;' % fs))
 
     def pay2play_wp(self):
-        raw = Component.pay2play(self.emul)
+        raw = Analyzer.pay2play(self.emul)
         if raw == None:
             return 'None'
         res = raw['eosio.token']+raw['transfer']
         return self.list2str(res)+'\l'
 
     def checkCondition_wp(self):
-        raw = Component.checkCondition(self.emul)
+        raw = Analyzer.checkCondition(self.emul)
         if raw == None:
             return 'None'
         return self.list2str(raw)+'\l'
 
     def createSecret_wp(self):
         # only works for 'rem'
-        raw = Component.createSecret(self.emul)
+        raw = Analyzer.createSecret(self.emul)
         if raw == None:
             return 'None'
         return self.list2str(raw)+'\l'
 
     def notify_wp(self):
-        raw = Component.notify(self.emul)
+        raw = Analyzer.notify(self.emul)
         if raw == None:
             return 'None'
         res = []
@@ -729,8 +729,8 @@ class ComGraph:
                 else:
                     continue
             return res
-        rd = Component.stateIO(self.emul)
-        wt = Component.stateIO(self.emul, read=False)
+        rd = Analyzer.stateIO(self.emul)
+        wt = Analyzer.stateIO(self.emul, read=False)
         if rd == None or wt == None:
             return 'None', 'None', 'None'
         rdd = dic_ana(rd)
@@ -750,7 +750,7 @@ class ComGraph:
         else:
             return rdd[rddk[0]]+'\l', wtd[wtdk[0]]+'\l', wtd[secret]+'\l'
 
-    def component_viz(self, filename=None):
+    def graph_viz(self, filename=None, dump_text=False, dump_graph=True):
         def viz(filename='summary.gv', TB=True):
             from graphviz import Digraph
 
@@ -807,31 +807,54 @@ class ComGraph:
                 T1()
             g.render(filename, view=False)
             return
+
+        thisfile = self.emul.filename.split(os.path.sep)[-1]
+        n1 = self.pay2play_wp()
+        n2 = self.checkCondition_wp()
+        n3 = self.createSecret_wp()
+        n6, n4, secret = self.stateIO_wp()
+        n5 = self.notify_wp()
+        n3 = secret if n3 == 'None' else n3
+
+        result_str = ['Detected Vulnerability Patterns:', 'F1 (Revertable):', n1[:-2], n5, 'F2 (Unpredictably Profitable):',
+                      n3, 'F3 (Information Leakage):', n4[:-2], n6, 'F4 (Causal Inference):', n2]
+        result_str = '\n'.join(result_str).replace('\l', '\n')
+        vul_flag = True
+        for pattern in [n1, n2, n3, n4, n5, n6]:
+            if pattern == "None":
+                vul_flag = False
+                break
+        if vul_flag:
+            result_str += '\nResult:\nDetected Groundhog Day Vulnerability in file %s\nCode:1' % thisfile
+        else:
+            result_str += '\nResult:\nNo Groundhog Day Vulnerability in file %s\nCode:0' % thisfile
+        print(result_str)
+
+        result_dir = 'results'
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
+        if dump_text:
+            with open(os.path.join(result_dir, thisfile+'.log'), 'w') as wlog:
+                wlog.write(result_str)
+        if not dump_graph:
+            return
+
         t1 = 'payToPlay'
         t2 = 'checkCondition'
         t3 = 'createSecret'
         t4 = 'writeState'
         t5 = 'notify'
         t6 = 'readState'
-        n1 = self.str2html(self.pay2play_wp(), t1)
-        # print(n1)
-        n2 = self.str2html(self.checkCondition_wp(), t2)
-        n3 = self.createSecret_wp()
-
-        n6, n4, secret = self.stateIO_wp()
-        n3 = secret if n3 == 'None' else n3
+        n1 = self.str2html(n1, t1)
+        n2 = self.str2html(n2, t2)
         n3 = self.str2html(n3, t3)
         n4 = self.str2html(n4, t4)
+        n5 = self.str2html(n5, t5)
         n6 = self.str2html(n6, t6)
-        n5 = self.str2html(self.notify_wp(), t5)
-        
-        result_dir = 'results'
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir)
-        
+
         if filename == None:
-            filename=self.emul.filename.split(os.path.sep)[-1]
-        viz(os.path.join(result_dir,filename+'.gv'))
+            filename = thisfile
+        viz(os.path.join(result_dir, filename+'.gv'))
         return
 
 

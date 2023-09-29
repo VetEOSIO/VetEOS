@@ -1,5 +1,5 @@
 
-from veteos.component import *
+from veteos.analyzer import *
 
 
 def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
