@@ -113,13 +113,13 @@ Detected Groundhog Day Vulnerabilities: 24
 Results are stored in ./results/
 ```
 
-The logs and generated analysis summary graphs will be stored in `./results`.
+- The logs and generated analysis summary graphs will be stored in `./results`.
 
-Example of analysis log: [./results/example.log](./results/example.log)
+- Example of analysis log: [./results/example.log](./results/example.log)
 
-Example of analysis summary graph: [./results/example.pdf](./results/example.pdf)
+- Example of analysis summary graph: [./results/example.pdf](./results/example.pdf)
 
-![analysis summary graph](results/example.pdf)
+  ![analysis summary graph](results/example.png)
 
 ### Dataflow Analysis Test (WIP)
 
