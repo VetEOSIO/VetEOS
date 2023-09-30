@@ -68,7 +68,7 @@ python3 tests/test_dependencies.py
 
 Expected Results:
 
-```bash
+```
 wasm test passed.
 graphviz test passed.
 timeout_decorator test passed.

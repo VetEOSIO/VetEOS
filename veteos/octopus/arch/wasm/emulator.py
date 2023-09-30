@@ -1,10 +1,10 @@
-from octopus.engine.emulator import EmulatorEngine
-from octopus.arch.wasm.cfg import WasmCFG
-from octopus.arch.wasm.vmstate import WasmVMstate
-from octopus.core.ssa import SSA, SSA_TYPE_FUNCTION, SSA_TYPE_CONSTANT
+from veteos.octopus.engine.emulator import EmulatorEngine
+from veteos.octopus.arch.wasm.cfg import WasmCFG
+from veteos.octopus.arch.wasm.vmstate import WasmVMstate
+from veteos.octopus.core.ssa import SSA, SSA_TYPE_FUNCTION, SSA_TYPE_CONSTANT
 
-from octopus.arch.wasm.format import (format_func_name,
-                                      format_bb_name)
+from veteos.octopus.arch.wasm.format import (format_func_name,
+                                             format_bb_name)
 
 import copy
 
@@ -46,25 +46,25 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
         self.ssa_counter = 0
         self.return_values = []
 
-        #logging.warning("Function available: %s" % [x.name for x in self.cfg.functions])
-        #logging.warning("In init():\nFunction available: %s" % [x.name for x in self.cfg.functions])
+        # logging.warning("Function available: %s" % [x.name for x in self.cfg.functions])
+        # logging.warning("In init():\nFunction available: %s" % [x.name for x in self.cfg.functions])
 
     def emulate_functions(self, list_functions_name=None, state=WasmVMstate(), depth=0):
 
         if list_functions_name:
-            #logging.warning('func name detected: '+str(list_functions_name))
+            # logging.warning('func name detected: '+str(list_functions_name))
             # function_name not in [x.name for x in self.functions]:
             if not set(list_functions_name).issubset([x.name for x in self.cfg.functions]):
-                #raise Exception('Some function_name given not in this module - available: %s', self.ana.func_prototypes)
+                # raise Exception('Some function_name given not in this module - available: %s', self.ana.func_prototypes)
                 raise Exception('Some function_name given not in this module - available: %s', [
                                 x.name for x in self.cfg.functions])
         else:
             list_functions_name = [x.name for x in self.cfg.functions]
-            #logging.warning('no func name detected: '+str(list_functions_name))
+            # logging.warning('no func name detected: '+str(list_functions_name))
         for f in list_functions_name:
             self.emulate_one_function(
                 function_name=f, state=state, depth=depth)
-        #logging.warning("End of emul_funcs(), return from emul_one_func()")
+        # logging.warning("End of emul_funcs(), return from emul_one_func()")
 
     def emulate_one_function(self, function_name, state=WasmVMstate(), depth=0):
 
@@ -170,12 +170,12 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
                         if i not in self.return_values:
                             self.return_values.append(i)
                     # print(state.details()['ssa_stack'][0])
-            #state.instructions_visited[instr.offset] = instr.offset
+            # state.instructions_visited[instr.offset] = instr.offset
         # print('end of emulate()')
-        #logging.warning("[X] Returning from basicblock %s", self.current_basicblock.name)
+        # logging.warning("[X] Returning from basicblock %s", self.current_basicblock.name)
 
         # automatic remove duplicated edges
-        #self.edges = list(set(self.edges))
+        # self.edges = list(set(self.edges))
     '''
     is_control
     is_parametric
@@ -274,13 +274,13 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
             # need to find offset false block using edges or basicblocks list
             if (instr.offset_end + 1) not in state.instructions_visited:
                 # logging.warning('[X]')
-                #logging.warning('[X] follow br_if default branch offset 0x%x' % (instr.offset_end + 1))
+                # logging.warning('[X] follow br_if default branch offset 0x%x' % (instr.offset_end + 1))
                 new_state = copy.deepcopy(state)
 
                 self.emulate(new_state, depth=depth + 1)
                 # after we return from emul - restore current_basicblock
                 self.current_basicblock = self.basicblock_per_instr[instr.offset]
-                #state.instructions_visited += new_state.instructions_visited
+                # state.instructions_visited += new_state.instructions_visited
 
             jump_addr = instr.xref
             # get instruction with this value as offset
@@ -289,7 +289,7 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
             if target.offset not in state.instructions_visited:
                 # condition are True
-                #logging.warning('[X] follow br_if branch offset 0x%x' % (target.offset))
+                # logging.warning('[X] follow br_if branch offset 0x%x' % (target.offset))
                 new_state = copy.deepcopy(state)
                 new_state.pc = self.current_f_instructions.index(target)
 
@@ -297,15 +297,15 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
                 self.emulate(new_state, depth=depth + 1)
 
             else:
-                #logging.warning('[X] Loop detected, skipping br_if 0x%x' % jump_addr[0])
+                # logging.warning('[X] Loop detected, skipping br_if 0x%x' % jump_addr[0])
                 halt = True
             halt = True
-            #logging.warning('SSA: branch if not yet supported')
+            # logging.warning('SSA: branch if not yet supported')
         elif instr.name == 'end':
             instr.ssa = SSA(method_name=instr.name)
             # check if it's the last instructions of the function
             if instr.offset == self.current_f_instructions[-1].offset:
-                #logging.warning("[X] break %s" % instr.name)
+                # logging.warning("[X] break %s" % instr.name)
                 halt = True
         elif instr.name == 'br':
             instr.ssa = SSA(method_name=instr.name)
@@ -317,13 +317,13 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
             if target.offset not in state.instructions_visited:
                 # condition are True
-                #logging.warning('[X] follow br branch offset 0x%x' % (target.offset))
+                # logging.warning('[X] follow br branch offset 0x%x' % (target.offset))
                 new_state = copy.deepcopy(state)
                 new_state.pc = self.current_f_instructions.index(target)
                 # follow the br
                 self.emulate(new_state, depth=depth + 1)
             else:
-                #logging.warning('[X] Loop detected, skipping br 0x%x' % jump_addr[0])
+                # logging.warning('[X] Loop detected, skipping br 0x%x' % jump_addr[0])
                 halt = True
             halt = True
 
@@ -333,13 +333,13 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
             # if (instr.offset_end + 1) not in state.instructions_visited:
             # logging.warning('[X]')
-            #logging.warning('[X] follow br_if default branch offset 0x%x' % (instr.offset_end + 1))
+            # logging.warning('[X] follow br_if default branch offset 0x%x' % (instr.offset_end + 1))
             new_state = copy.deepcopy(state)
 
             self.emulate(new_state, depth=depth + 1)
             # after we return from emul - restore current_basicblock
             self.current_basicblock = self.basicblock_per_instr[instr.offset]
-            #state.instructions_visited += new_state.instructions_visited
+            # state.instructions_visited += new_state.instructions_visited
 
             jump_addr = instr.xref
             # get instruction with this value as offset
@@ -348,7 +348,7 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
             if target.offset not in state.instructions_visited:
                 # condition are True
-                #logging.warning('[X] follow br_if branch offset 0x%x' % (target.offset))
+                # logging.warning('[X] follow br_if branch offset 0x%x' % (target.offset))
                 new_state = copy.deepcopy(state)
                 new_state.pc = self.current_f_instructions.index(target)
 
@@ -356,14 +356,14 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
                 self.emulate(new_state, depth=depth + 1)
 
             else:
-                #logging.warning('[X] Loop detected, skipping br_if 0x%x' % jump_addr[0])
+                # logging.warning('[X] Loop detected, skipping br_if 0x%x' % jump_addr[0])
                 halt = True
             halt = True
         elif instr.name == 'br_table':
             arg = [state.ssa_stack.pop()]
             instr.ssa = SSA(method_name=instr.name, args=arg)
             # TODO branch br_table
-            #logging.warning('SSA: branch br_table not yet supported')
+            # logging.warning('SSA: branch br_table not yet supported')
         elif instr.name == 'return':
             # TODO: possible problem: if no value in stack, return void
             if len(state.ssa_stack) > 0:
@@ -429,13 +429,13 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
     def emul_variable_instr(self, instr, state):
         if instr.name in ['get_local', 'get_global']:
-            #instr.ssa = SSA(new_assignement=self.ssa_counter, method_name=instr.name)
+            # instr.ssa = SSA(new_assignement=self.ssa_counter, method_name=instr.name)
             instr.ssa = SSA(new_assignement=self.ssa_counter,
                             method_name=instr.operand_interpretation)
             state.ssa_stack.append(instr)
             self.ssa_counter += 1
         elif instr.name in ['set_local', 'set_global']:
-            #instr.ssa = SSA(method_name=instr.name)
+            # instr.ssa = SSA(method_name=instr.name)
             arg = [state.ssa_stack.pop()]
             instr.ssa = SSA(method_name=instr.operand_interpretation, args=arg)
         elif instr.name == 'tee_local':
@@ -450,7 +450,7 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
         # load
         if 'load' in instr.name:
             arg = [state.ssa_stack.pop()]
-            #instr.ssa = SSA(new_assignement=self.ssa_counter, method_name=instr.name, args=arg)
+            # instr.ssa = SSA(new_assignement=self.ssa_counter, method_name=instr.name, args=arg)
             instr.ssa = SSA(new_assignement=self.ssa_counter,
                             method_name=instr.operand_interpretation, args=arg)
             state.ssa_stack.append(instr)
@@ -458,7 +458,7 @@ class WasmSSAEmulatorEngine(EmulatorEngine):
 
         elif 'store' in instr.name:
             arg = [state.ssa_stack.pop(), state.ssa_stack.pop()]
-            #instr.ssa = SSA(method_name=instr.name, args=arg)
+            # instr.ssa = SSA(method_name=instr.name, args=arg)
             instr.ssa = SSA(method_name=instr.operand_interpretation, args=arg)
 
         elif instr.name == 'current_memory':

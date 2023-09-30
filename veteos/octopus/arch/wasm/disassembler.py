@@ -1,11 +1,11 @@
-from octopus.engine.disassembler import Disassembler
-from octopus.core.function import Function
-from octopus.core.utils import bytecode_to_bytes
+from veteos.octopus.engine.disassembler import Disassembler
+from veteos.octopus.core.function import Function
+from veteos.octopus.core.utils import bytecode_to_bytes
 
-from octopus.arch.wasm.instruction import WasmInstruction
-from octopus.arch.wasm.wasm import Wasm
+from veteos.octopus.arch.wasm.instruction import WasmInstruction
+from veteos.octopus.arch.wasm.wasm import Wasm
 
-# from octopus.arch.wasm.decode import decode_module
+# from veteos.octopus.arch.wasm.decode import decode_module
 from wasm.decode import decode_module
 from wasm.modtypes import CodeSection
 from wasm.compat import byte2int
@@ -42,8 +42,10 @@ class WasmDisassembler(Disassembler):
         operand_interpretation = None
 
         if imm_struct is not None:
-            operand_size, operand, _ = imm_struct.from_raw(None, bytecode_wnd[1:])
-            insn = inst_namedtuple(OPCODE_MAP[opcode_id], operand, 1 + operand_size)
+            operand_size, operand, _ = imm_struct.from_raw(
+                None, bytecode_wnd[1:])
+            insn = inst_namedtuple(
+                OPCODE_MAP[opcode_id], operand, 1 + operand_size)
             operand_interpretation = format_instruction(insn)
         insn_byte = bytecode_wnd[:1 + operand_size].tobytes()
         instruction = WasmInstruction(opcode_id, name, imm_struct, operand_size,
@@ -94,7 +96,7 @@ class WasmDisassembler(Disassembler):
         sections = list(mod_iter)
 
         # iterate over all section
-        #code_data = [cur_sec_data for cur_sec, cur_sec_data in sections if isinstance(cur_sec_data.get_decoder_meta()['types']['payload'], CodeSection)][0]
+        # code_data = [cur_sec_data for cur_sec, cur_sec_data in sections if isinstance(cur_sec_data.get_decoder_meta()['types']['payload'], CodeSection)][0]
         for cur_sec, cur_sec_data in sections:
             sec = cur_sec_data.get_decoder_meta()['types']['payload']
             if isinstance(sec, CodeSection):

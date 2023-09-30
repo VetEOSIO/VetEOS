@@ -1,4 +1,4 @@
-from octopus.core.utils import bytecode_to_bytes
+from veteos.octopus.core.utils import bytecode_to_bytes
 
 
 class BytecodeEmptyException(Exception):

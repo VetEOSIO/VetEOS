@@ -14,14 +14,14 @@ from wasm.modtypes import (TypeSection,
                            NAME_SUBSEC_FUNCTION,
                            NAME_SUBSEC_LOCAL)
 
-from octopus.arch.wasm.constant import LANG_TYPE, KIND_TYPE
-from octopus.arch.wasm.format import (format_kind_function,
-                                      format_kind_table,
-                                      format_kind_memory,
-                                      format_kind_global)
+from veteos.octopus.arch.wasm.constant import LANG_TYPE, KIND_TYPE
+from veteos.octopus.arch.wasm.format import (format_kind_function,
+                                             format_kind_table,
+                                             format_kind_memory,
+                                             format_kind_global)
 
 from wasm.decode import decode_module
-from octopus.core.utils import bytecode_to_bytes
+from veteos.octopus.core.utils import bytecode_to_bytes
 
 import io
 import json
@@ -134,7 +134,8 @@ class WasmModuleAnalyzer(object):
             param_str = ''
             return_str = ''
 
-            param_str += ' '.join([LANG_TYPE.get(_x) for _x in entry.param_types])
+            param_str += ' '.join([LANG_TYPE.get(_x)
+                                  for _x in entry.param_types])
             if entry.return_type:
                 return_str = '%s' % LANG_TYPE.get(entry.return_type)
 
@@ -328,7 +329,6 @@ class WasmModuleAnalyzer(object):
             data_list.append(fmt)
         return data_list
 
-
     def __decode_name_section(self, name_subsection):
         """
         .. seealso:: https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#name-section
@@ -453,7 +453,8 @@ class WasmModuleAnalyzer(object):
             elif isinstance(cur_sec, NameSubSection):
                 self.names = self.__decode_name_section(cur_sec_data)
             else:
-                self.customs.append(self.__decode_unknown_section(cur_sec_data))
+                self.customs.append(
+                    self.__decode_unknown_section(cur_sec_data))
 
         # create ordered list of functions
         self.func_prototypes = self.get_func_prototypes_ordered()
@@ -464,7 +465,8 @@ class WasmModuleAnalyzer(object):
         return True if matching_list else False
 
     def get_emscripten_calls(self):
-        res = [x for x, _, _, _ in self.func_prototypes if is_emscripten_func(x)]
+        res = [x for x, _, _,
+               _ in self.func_prototypes if is_emscripten_func(x)]
         return res
 
     # emscripten syscall from:
@@ -472,7 +474,8 @@ class WasmModuleAnalyzer(object):
     # * http://gauss.ececs.uc.edu/Courses/c4029/code/syscall_32.tbl.html
     def contains_emscripten_syscalls(self):
         EMSCRIPTEN_SYSCALL_JSON = '/signatures/emscripten_syscalls.json'
-        path = os.path.dirname(os.path.realpath(__file__)) + EMSCRIPTEN_SYSCALL_JSON
+        path = os.path.dirname(os.path.realpath(
+            __file__)) + EMSCRIPTEN_SYSCALL_JSON
 
         json_data = open(path).read()
         data = json.loads(json_data)

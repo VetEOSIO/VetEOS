@@ -1,4 +1,4 @@
-from octopus.engine.engine import VMstate
+from veteos.octopus.engine.engine import VMstate
 
 
 class WasmVMstate(VMstate):
@@ -16,7 +16,7 @@ class WasmVMstate(VMstate):
         self.instr = None
 
         self.instructions_visited = list()
-        #self.instructions_visited = dict()
+        # self.instructions_visited = dict()
 
     def details(self):
 

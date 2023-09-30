@@ -1,4 +1,4 @@
-from octopus.arch.wasm.emulator import WasmSSAEmulatorEngine as WE
+from veteos.octopus.arch.wasm.emulator import WasmSSAEmulatorEngine as WE
 
 
 from veteos.utils import *
@@ -29,7 +29,7 @@ class Contract:
             self.emul.emulate_functions()
 
     def show_cfg(self, func_name: list):
-        from octopus.analysis.graph import CFGGraph
+        from veteos.octopus.analysis.graph import CFGGraph
         ssa_cfg = CFGGraph(self.emul.cfg)
         if func_name != None and len(func_name) > 0:
             ssa_cfg.view_functions(only_func_name=func_name,
@@ -39,7 +39,7 @@ class Contract:
             ssa_cfg.view(simplify=False, ssa=True)
 
     def show_call_graph(self):
-        from octopus.arch.wasm.cfg import WasmCFG
+        from veteos.octopus.arch.wasm.cfg import WasmCFG
         fp = open(self.filename, 'rb')
         octo_bytecode = fp.read()
         octo_cfg = WasmCFG(octo_bytecode)

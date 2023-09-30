@@ -1,4 +1,4 @@
-from octopus.arch.wasm.instruction import WasmInstruction
+from veteos.octopus.arch.wasm.instruction import WasmInstruction
 
 
 class VetInstruction(WasmInstruction):

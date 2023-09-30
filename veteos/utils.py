@@ -1,6 +1,6 @@
 
-from octopus.arch.wasm.instruction import Instruction
-from octopus.arch.wasm.cfg import Function
+from veteos.octopus.arch.wasm.instruction import Instruction
+from veteos.octopus.arch.wasm.cfg import Function
 
 
 def is_cmp_ins(ins: str):

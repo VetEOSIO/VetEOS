@@ -3,22 +3,22 @@
 from logging import getLogger
 from graphviz import Digraph
 
-from octopus.analysis.cfg import CFG
-from octopus.analysis.graph import CFGGraph
+from veteos.octopus.analysis.cfg import CFG
+from veteos.octopus.analysis.graph import CFGGraph
 
-from octopus.arch.wasm.analyzer import WasmModuleAnalyzer
-from octopus.arch.wasm.disassembler import WasmDisassembler
-from octopus.arch.wasm.format import (format_bb_name,
-                                      format_func_name)
-from octopus.arch.wasm.wasm import _groups
+from veteos.octopus.arch.wasm.analyzer import WasmModuleAnalyzer
+from veteos.octopus.arch.wasm.disassembler import WasmDisassembler
+from veteos.octopus.arch.wasm.format import (format_bb_name,
+                                             format_func_name)
+from veteos.octopus.arch.wasm.wasm import _groups
 
-from octopus.core.basicblock import BasicBlock
-from octopus.core.edge import (Edge,
-                               EDGE_UNCONDITIONAL,
-                               EDGE_CONDITIONAL_TRUE, EDGE_CONDITIONAL_FALSE,
-                               EDGE_FALLTHROUGH, EDGE_CALL)
-from octopus.core.function import Function
-from octopus.core.utils import bytecode_to_bytes
+from veteos.octopus.core.basicblock import BasicBlock
+from veteos.octopus.core.edge import (Edge,
+                                      EDGE_UNCONDITIONAL,
+                                      EDGE_CONDITIONAL_TRUE, EDGE_CONDITIONAL_FALSE,
+                                      EDGE_FALLTHROUGH, EDGE_CALL)
+from veteos.octopus.core.function import Function
+from veteos.octopus.core.utils import bytecode_to_bytes
 
 
 logging = getLogger(__name__)
@@ -98,8 +98,8 @@ def enum_func_call_edges(functions, len_imports):
                 # the last operand is the index on the table
                 # print(inst.operand_interpretation)
                 # print(type(inst.insn_byte[1]))
-                #node_to = inst.insn_byte[1]
-                #node_to = int(inst.operand_interpretation.split(',')[-1].split(' ')[-1])
+                # node_to = inst.insn_byte[1]
+                # node_to = int(inst.operand_interpretation.split(',')[-1].split(' ')[-1])
                 call_edges.append((node_from, node_to))
 
     return call_edges
@@ -241,7 +241,7 @@ def enum_blocks_edges(function_id, instructions):
                              EDGE_CONDITIONAL_TRUE))
                 if_b = next(
                     iter([b for b in blocks_list if b[1] == inst.offset]), None)
-                #else_block = blocks_list[blocks_list.index(if_block) + 1]
+                # else_block = blocks_list[blocks_list.index(if_block) + 1]
                 jump_target = if_b[2] + 1
                 edges.append(Edge(block.name,
                              format_bb_name(function_id, jump_target),
@@ -297,7 +297,7 @@ class WasmCFG(CFG):
         self.edges = list()
 
         self.analyzer = WasmModuleAnalyzer(self.module_bytecode)
-        #print('\n'.join(['%s:%s' % item for item in self.analyzer.__dict__.items()]))
+        # print('\n'.join(['%s:%s' % item for item in self.analyzer.__dict__.items()]))
         # exit(0)
         self.run_static_analysis()
 
@@ -332,9 +332,9 @@ class WasmCFG(CFG):
                     if 'load' in ins.name or 'store' in ins.name:
                         print(
                             '\n'.join(['%s:%s' % item for item in ins.__dict__.items()]))'''
-                    # if ins.ssa != None:
-                        #print('\n'.join(['%s:%s' % item for item in ins.__dict__.items()]))
-                        # exit(0)
+            # if ins.ssa != None:
+            # print('\n'.join(['%s:%s' % item for item in ins.__dict__.items()]))
+            # exit(0)
         '''print('no result')
         exit(0)'''
 

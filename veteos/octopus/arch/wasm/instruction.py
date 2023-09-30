@@ -1,5 +1,5 @@
-from octopus.core.instruction import Instruction
-from octopus.arch.wasm.wasm import _groups
+from veteos.octopus.core.instruction import Instruction
+from veteos.octopus.arch.wasm.wasm import _groups
 
 
 class WasmInstruction(Instruction):

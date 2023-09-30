@@ -1,4 +1,4 @@
-from octopus.arch.wasm.cfg import Function
+from veteos.octopus.arch.wasm.cfg import Function
 from veteos.instruction import VetInstruction
 from veteos.node import Node
 from veteos.utils import *
