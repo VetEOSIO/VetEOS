@@ -58,6 +58,16 @@ python3 main.py -f samples/30758713_14_0.wasm -g -d
 python3 main.py -v
 ```
 
+Commands:
+
+- `load <file path>`: load `.wasm` file.
+- `f <function name>`: initialize a function.
+- `i <instruction offset>`: tag an instruction, the offset can be either decimal or hexadecimal (starting with `0x`).
+- `n`: jump to the next instruction.
+- `p`: jump to the previous instruction.
+- `fi`: print all instructions in the function.
+- `q`: exit the VetEOS terminal.
+
 ## Run Test
 
 ### Basic Test
