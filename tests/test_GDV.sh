@@ -1,8 +1,9 @@
 #!/bin/bash
 
 directory="samples"
-total_files=0
+index=0
 count=0
+total_files=$(find $directory -maxdepth 1 -type f -name "*.wasm" | wc -l)
 
 if [ ! -d "$directory" ]; then
   echo "Directory not found: $directory"
@@ -11,15 +12,15 @@ fi
 
 for file in "$directory"/*; do
   if [[ -f "$file" && "$file" == *.wasm ]]; then
-    echo "Analyzing file: $file"
+    index=$((index + 1))
+    echo "Analyzing file: $file ($index/$total_files)"
     output=$(python3 main.py -f "$file" -g -d)
-    total_files=$((total_files + 1))
     if [ "${output: -1}" == "1" ]; then
       count=$((count + 1))
     fi
   fi
 done
 
-echo "Total number of files analyzed: $total_files"
+echo "Total number of files analyzed: $index"
 echo "Detected Groundhog Day Vulnerabilities: $count"
 echo "Results are stored in ./results/"

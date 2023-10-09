@@ -87,6 +87,8 @@ All dependency tests passed.
 
 ### GDV Detection Test
 
+#### GDV Detection and Analysis Graph Generation Test
+
 ```bash
 bash tests/test_GDV.sh
 ```
@@ -94,30 +96,30 @@ bash tests/test_GDV.sh
 Expected Results:
 
 ```
-Analyzing file: samples/127922358_8_0.wasm
-Analyzing file: samples/127926023_31_0.wasm
-Analyzing file: samples/127926269_6_0.wasm
-Analyzing file: samples/153965273_9_0.wasm
-Analyzing file: samples/209093393_2_0.wasm
-Analyzing file: samples/30758713_14_0.wasm
-Analyzing file: samples/31645645_29_0.wasm
-Analyzing file: samples/63459288_16_0.wasm
-Analyzing file: samples/63464623_4_0.wasm
-Analyzing file: samples/63467919_7_0.wasm
-Analyzing file: samples/63914559_23_0.wasm
-Analyzing file: samples/63944572_37_0.wasm
-Analyzing file: samples/63946053_12_0.wasm
-Analyzing file: samples/63946568_11_0.wasm
-Analyzing file: samples/64243784_23_0.wasm
-Analyzing file: samples/66017822_10_0.wasm
-Analyzing file: samples/69973977_37_0.wasm
-Analyzing file: samples/70312874_5_0.wasm
-Analyzing file: samples/72430415_4_0.wasm
-Analyzing file: samples/72583065_10_0.wasm
-Analyzing file: samples/72602858_11_0.wasm
-Analyzing file: samples/72603478_10_0.wasm
-Analyzing file: samples/76382615_19_0.wasm
-Analyzing file: samples/88160916_2_0.wasm
+Analyzing file: samples/127922358_8_0.wasm (1/24)
+Analyzing file: samples/127926023_31_0.wasm (2/24)
+Analyzing file: samples/127926269_6_0.wasm (3/24)
+Analyzing file: samples/153965273_9_0.wasm (4/24)
+Analyzing file: samples/209093393_2_0.wasm (5/24)
+Analyzing file: samples/30758713_14_0.wasm (6/24)
+Analyzing file: samples/31645645_29_0.wasm (7/24)
+Analyzing file: samples/63459288_16_0.wasm (8/24)
+Analyzing file: samples/63464623_4_0.wasm (9/24)
+Analyzing file: samples/63467919_7_0.wasm (10/24)
+Analyzing file: samples/63914559_23_0.wasm (11/24)
+Analyzing file: samples/63944572_37_0.wasm (12/24)
+Analyzing file: samples/63946053_12_0.wasm (13/24)
+Analyzing file: samples/63946568_11_0.wasm (14/24)
+Analyzing file: samples/64243784_23_0.wasm (15/24)
+Analyzing file: samples/66017822_10_0.wasm (16/24)
+Analyzing file: samples/69973977_37_0.wasm (17/24)
+Analyzing file: samples/70312874_5_0.wasm (18/24)
+Analyzing file: samples/72430415_4_0.wasm (19/24)
+Analyzing file: samples/72583065_10_0.wasm (20/24)
+Analyzing file: samples/72602858_11_0.wasm (21/24)
+Analyzing file: samples/72603478_10_0.wasm (22/24)
+Analyzing file: samples/76382615_19_0.wasm (23/24)
+Analyzing file: samples/88160916_2_0.wasm (24/24)
 Total number of files analyzed: 24
 Detected Groundhog Day Vulnerabilities: 24
 Results are stored in ./results/
@@ -130,6 +132,28 @@ Results are stored in ./results/
 - Example of analysis summary graph: [./results/example.pdf](./results/example.pdf)
 
   ![analysis summary graph](results/example.png)
+
+#### Large-scale GDV Detection Test
+
+Run VetEOS on 735 samples, which will take a relatively long time.
+
+```bash
+bash tests/test_GDV_all.sh
+```
+
+Expected Results:
+
+```
+Analyzing file: samples/all/110070118_1_0.wasm (1/735)
+Analyzing file: samples/all/110292478_17_0.wasm (2/735)
+...
+Analyzing file: samples/all/98838110_6_0.wasm (734/735)
+Analyzing file: samples/all/99649914_8_0.wasm (735/735)
+Total number of files analyzed: 735
+Detected Groundhog Day Vulnerabilities: 735
+```
+
+If need to dump the log files to `./resluts/`, modify the line 17 of `./tests/test_GDV_all.sh` to be `output=$(python3 main.py -f "$file" -g -d)`.
 
 ### Dataflow Analysis Test
 

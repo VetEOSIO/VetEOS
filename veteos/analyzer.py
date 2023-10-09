@@ -83,7 +83,7 @@ class Analyzer:
             '''
             similar to find_action_chain() in txn_ana()
             '''
-            def find_strings(func: Function) -> list:
+            def find_strings(func: Function) -> dict:
                 funcname = func.name
                 eosio_token = False
                 transfer = False
@@ -131,9 +131,9 @@ class Analyzer:
         res = {receipt: []}
         reci = emul.get_call_edges_to(receipt)
         if reci != None:
-            for rc in reci:
-                rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
-                res[receipt].append(rc_ins)
+            rc = reci[-1]
+            rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
+            res[receipt] = rc_ins
         inline = inline_eos_trans(emul)
         res['eosio.token::transfer'] = inline
         if reci != None or inline != None:
@@ -186,9 +186,10 @@ class Analyzer:
                 if idx < 1:  # 'db_find' not found in the same chain
                     dbfs = find_func_from_tree_new(
                         emul, dbfind, cmp=lambda _, k: 'db_' in k and 'find_i' in k)
-                    dbf = dbfs[0]  # select the first chain
-                    tmp[dbfind] = Analyzer.find_call_ins(
-                        emul, dbf[-2], 'find_i')
+                    if len(dbfs) > 0:
+                        dbf = dbfs[0]  # select the first chain
+                        tmp[dbfind] = Analyzer.find_call_ins(
+                            emul, dbf[-2], 'find_i')
                     if len(dbfs) == 0:  # 'db_find' not found, to find other finding APIs
                         dbfs = find_func_from_tree_new(
                             emul, dbfind, cmp=lambda _, k: is_db_find(k))
@@ -408,7 +409,7 @@ class Analyzerssa:
             '''
             similar to find_action_chain() in txn_ana()
             '''
-            def find_strings(func: Function) -> list:
+            def find_strings(func: Function) -> dict:
                 funcname = func.name
                 eosio_token = False
                 transfer = False
@@ -466,9 +467,9 @@ class Analyzerssa:
         res = {receipt: []}
         reci = emul.get_call_edges_to(receipt)
         if reci != None:
-            for rc in reci:
-                rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
-                res[receipt].append(rc_ins)
+            rc = reci[-1]
+            rc_ins = Analyzer.find_call_ins(emul, rc, receipt)[-2:]
+            res[receipt] = rc_ins
         inline = inline_eos_trans(emul)
         res['eosio.token::transfer'] = inline
         if reci != None or inline != None:
@@ -521,9 +522,10 @@ class Analyzerssa:
                 if idx < 1:  # 'db_find' not found in the same chain
                     dbfs = find_func_from_tree_new(
                         emul, dbfind, cmp=lambda _, k: 'db_' in k and 'find_i' in k)
-                    dbf = dbfs[0]  # select the first chain
-                    tmp[dbfind] = Analyzer.find_call_ins(
-                        emul, dbf[-2], 'find_i')
+                    if len(dbfs) > 0:
+                        dbf = dbfs[0]  # select the first chain
+                        tmp[dbfind] = Analyzer.find_call_ins(
+                            emul, dbf[-2], 'find_i')
                     if len(dbfs) == 0:  # 'db_find' not found, to find other finding APIs
                         dbfs = find_func_from_tree_new(
                             emul, dbfind, cmp=lambda _, k: is_db_find(k))
@@ -659,6 +661,8 @@ class Solver:
         self.emul = emul
 
     def list2str(self, raw: list, c: str = ':'):
+        # if len(raw) == 0:
+        #     return ''
         title = raw[0].split(c)[0]+c
         return title+('\l' if not title.endswith('\l') else '') + ('\l'.join(raw)).replace(title, '')
 
@@ -697,7 +701,7 @@ class Solver:
         raw = Analyzer.notify(self.emul)
         if raw == None:
             return 'None'
-        res = []
+        res = ''
         ts = raw['eosio.token::transfer']
         rc = raw['require_recipient']
         tmp = []
@@ -705,8 +709,8 @@ class Solver:
             for k in ['eosio.token', 'transfer', 'active',]:
                 tmp.append(ts[k][0])
             res = [self.list2str(tmp)]
-        res.append(self.list2str([ts['inline'][-1]]))
-        res = self.list2str(res, '\l')
+            res.append(self.list2str([ts['inline'][-1]]))
+            res = self.list2str(res, '\l')
         if len(rc) > 0:
             res += self.list2str([rc[-1]])
         return res+'\l'
@@ -837,7 +841,7 @@ class Solver:
             with open(os.path.join(result_dir, thisfile+'.log'), 'w') as wlog:
                 wlog.write(result_str)
         if not dump_graph:
-            return
+            return vul_flag
 
         t1 = 'payToPlay'
         t2 = 'checkCondition'
@@ -855,7 +859,7 @@ class Solver:
         if filename == None:
             filename = thisfile
         viz(os.path.join(result_dir, filename+'.gv'))
-        return
+        return vul_flag
 
 
 def find_func_from_tree(emul: Contract, target: str, passes: str = None, full: bool = False) -> list:
