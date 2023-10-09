@@ -1,6 +1,6 @@
 #!/bin/bash
 
-directory="samples/all"
+directory="samples/allvulnerable"
 index=0
 count=0
 total_files=$(find $directory -maxdepth 1 -type f -name "*.wasm" | wc -l)

@@ -165,3 +165,35 @@ Expected Results:
 
 - You will see a process of automatic dataflow tracking testing through the VetEOS terminal.
 - Example output: [./results/example_output_dataflow_test.log](./results/example_output_dataflow_test.log)
+
+### Analysis Accuracy Test
+
+Note that accuracy tests requires manual verification against the source code, this test only automatically generates logs.
+
+#### Entry Point Detection Test
+
+```bash
+python3 tests/tests.py entrypoint
+```
+
+Expected Results:
+
+```
+...
+samples:98
+error:0
+```
+
+#### Dataflow Accuracy Test
+
+```bash
+python3 tests/tests.py dataflow
+```
+
+Expected Results:
+
+```
+...
+df cases:537
+error:0
+```
