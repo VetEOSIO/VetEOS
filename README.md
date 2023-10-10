@@ -168,7 +168,7 @@ Expected Results:
 
 ### Analysis Accuracy Test
 
-Note that accuracy tests requires manual verification against the source code, this test only automatically generates logs.
+Note that accuracy tests requires manual verification against the source code, this test only automatically generates logs. The source code of the tested samples can be found in `./samples/github/source.zip`.
 
 #### Entry Point Detection Test
 

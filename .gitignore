@@ -111,7 +111,7 @@ venv.bak/
 # my bak
 bak
 tmp.*
-test.*
+testme.*
 
 .vscode
 
