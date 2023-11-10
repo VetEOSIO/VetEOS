@@ -18,7 +18,7 @@ In a Groundhog Day attack, adversaries can exploit the unique rollback problem i
 ### Environment
 
 - Ubuntu >= 16.04
-- Python >= 3.5
+- Python 3.7 or 3.8
 
 ### Dependencies
 
@@ -38,6 +38,12 @@ git clone https://github.com/VetEOSIO/VetEOS.git
 
 ```bash
 python3 install_dependencies.py
+```
+
+Note: the script `install_dependencies.py` uses `pip` to install `graphviz`, if `pip` fails, please try `apt-get`:
+
+```bash
+sudo apt-get install graphviz
 ```
 
 ### Detect GDV
