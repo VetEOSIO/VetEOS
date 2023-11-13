@@ -1,7 +1,7 @@
 
 from veteos.analyzer import *
 
-
+# recursively search a target function called from a function, return the call sequence
 def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
     np = []
     for p in parent:
@@ -47,6 +47,7 @@ def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
     return res
 
 
+# analyze the table names from database operation instructions
 def table_name_analysis(emul: Contract, data):
     fn = set()
     for path in data:
@@ -91,6 +92,7 @@ def table_name_analysis(emul: Contract, data):
     return table_dic
 
 
+# analyze the tables name relation between different tables
 @timeout_decorator.timeout(30)
 def table_analysis(emul: Contract, actions: list):
     log = ''
@@ -115,6 +117,7 @@ def table_analysis(emul: Contract, actions: list):
     return res_dic, log
 
 
+# get the name of a table
 def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
     # must contain table name in param
     if 'db_find' in ins_name or \
@@ -195,6 +198,7 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
             return
 
 
+# print the function call sequence
 def show_func_flow(data: list):
     '''
     only for visulization
