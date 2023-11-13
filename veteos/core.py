@@ -6,6 +6,10 @@ import timeout_decorator
 
 
 class Contract:
+    '''
+    a basic contract class
+    '''
+
     def __init__(self, filename: str) -> None:
         self.filename = filename
         self.emul = self.init_emul(filename)
@@ -232,6 +236,10 @@ class Contract:
 
 
 class Func():
+    '''
+    a basic function class
+    '''
+
     def __init__(self, emul: Contract, name: str) -> None:
         self.name = name
         self.emul = emul
@@ -390,6 +398,10 @@ class Func():
 
 
 class Node():
+    '''
+    a node class
+    '''
+
     def __init__(self, data) -> None:
         self.data = data
         self.parents = []
@@ -406,6 +418,9 @@ class Node():
 
 @timeout_decorator.timeout(5)
 def get_func_wrapper(emul: Contract, fn: str):
+    '''
+    a wrapper function for initialize function
+    '''
     try:
         func = emul.get_Func(fn)
     except:
@@ -415,6 +430,9 @@ def get_func_wrapper(emul: Contract, fn: str):
 
 @timeout_decorator.timeout(5)
 def get_emul_wrapper(file: str):
+    '''
+    a wrapper function for initialize contract
+    '''
     try:
         return Contract(file)
     except:
@@ -422,6 +440,10 @@ def get_emul_wrapper(file: str):
 
 
 class LocalSSA():
+    '''
+    SSA class
+    '''
+
     def __init__(self, data: Instruction, asmt: str, args: str) -> None:
         self.data = data
         self.asmt = asmt
@@ -432,6 +454,9 @@ class LocalSSA():
 
 
 def local_ssa(local: str, BNet: dict):
+    '''
+    SSA analysis function
+    '''
     local_idx = 0
     block_idx = {}
     res = []
@@ -468,6 +493,9 @@ def local_ssa(local: str, BNet: dict):
 
 
 def merge_local_ssa(block: str, Bnet: dict, block_idx: dict, visited: list):
+    '''
+    the merge step in SSA algorithm
+    '''
     if block in block_idx.keys():
         return block_idx[block]['ssa']
     else:
@@ -491,6 +519,7 @@ def merge_local_ssa(block: str, Bnet: dict, block_idx: dict, visited: list):
         return ssa
 
 
+# generate SSA for memory model
 def memory_ssa(memo: str, BNet: dict, ins2blk: dict, memo_ins: list):
     memo_l = []
     for i in memo_ins:
@@ -564,8 +593,11 @@ def get_memory_ssa(memo_instr: list, locals: list, func: Func) -> list:
 
 
 def track_prev(instr: Instruction):
-    '''if instr.ssa.is_constant:
-        return []'''
+    '''
+    track the previous instruction
+    '''
+    # if instr.ssa.is_constant:
+    #     return []
     ins = [instr]
     if not instr.ssa.is_constant and instr.ssa.args is not None:
         for arg in instr.ssa.args:
@@ -574,6 +606,9 @@ def track_prev(instr: Instruction):
 
 
 def track_prev_with_local(instr: Instruction, func: Func):
+    '''
+    track the previous instruction, including the local variables
+    '''
     # 1st step
     pre_ins = track_prev(instr)
     locals = []
@@ -671,10 +706,13 @@ def get_prev_source(prev_ins: list) -> Instruction:
 
 
 def track_prev_one(instr: Instruction):
+    '''
+    find the previous one instruction
+    '''
     if is_constant_ins(instr):
         return None
-    '''if is_call_ins(instr):
-        return None'''
+    # if is_call_ins(instr):
+    #     return None
     if instr.ssa.args:
         return instr.ssa.args
     return None
@@ -721,6 +759,9 @@ def track_prev_all(instr: Instruction, func: Func) -> list:
 
 
 def track_next(instr: Instruction, ins_list: list) -> list:
+    '''
+    return a list containing all next instructions of an instruction
+    '''
     ins = track_next_one(instr, ins_list)
     for i in ins:
         ins += track_next(i, ins_list)
@@ -728,6 +769,9 @@ def track_next(instr: Instruction, ins_list: list) -> list:
 
 
 def track_next_one(instr: Instruction, ins_list: list) -> list:
+    '''
+    return one next instruction of an instruction
+    '''
     ins = []
     for i in ins_list:
         if i.ssa is not None and type(i.ssa.args) == list:
@@ -737,6 +781,9 @@ def track_next_one(instr: Instruction, ins_list: list) -> list:
 
 
 def track_next_ssa(var: Instruction, ssa_list: list) -> list:
+    '''
+    return a list of SSA format of next instructions of an instruction
+    '''
     res = []
     for s in ssa_list:
         if var in s.args:
@@ -780,6 +827,9 @@ def get_local_dic(localssa: list) -> dict:
 
 
 def ex_fun(func: Func) -> list:
+    '''
+    find all external function call, return the names
+    '''
     # the number of import funcs
     # importn = len(func.emul.emul.ana.imports_func)
     importn = func.emul.get_import_len()
@@ -798,6 +848,9 @@ def ex_fun(func: Func) -> list:
 
 
 def para_taint(func: Func) -> bool:
+    '''
+    check whether the parameters of a function is tainted
+    '''
     # Step 1: detect the number of parameters
     f = func.func
     paras = func.get_param()
@@ -856,6 +909,9 @@ def para_taint(func: Func) -> bool:
 
 
 def external_check(func: Func):
+    '''
+    check the dataflow in external functions
+    '''
     print('external check start:')
     exfunc = ex_fun(func)   # get the external functions
     # fns = ['$func%s' % f.operand_interpretation.split()[1] for f in exfunc]
