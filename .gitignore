@@ -118,3 +118,4 @@ testme.*
 # Test results
 # results/
 *.wasm.log
+logs

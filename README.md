@@ -203,3 +203,34 @@ Expected Results:
 df cases:537
 error:0
 ```
+
+## Architecture
+
+```
+|-- results/                        test results and example outputs
+|-- samples/                        vulerable contract samples
+| |-- allvulerable/                 all 735 vulerable samples
+| |-- github/                       98 open-source vulerable samples
+|-- tests/							test scripts
+| |-- commands.txt					commands for VetEOS Terminal Test
+| |-- test_dataflow.sh				script for Dataflow Analysis Test
+| |-- test_dependencies.py			script for Dependency Test
+| |-- test_GDV_all.sh				script for Large-scale GDV Detection Test
+| |-- test_GDV.sh					script for GDV Detection Test
+| |-- tests.py						script for Analysis Accuracy Test
+|-- veteos/							core code of VetEOS
+| |-- octopus/						Octopus libraries
+| |-- analyses.py					secondary analysis algorithms
+| |-- analyzer.py					main analyzer class
+| |-- contract.py					Contract class for contract initialization
+| |-- core.py						core analysis algorithms
+| |-- function.py					VetFunction class for function initialization
+| |-- instruction.py				VetInstruction class for instruction initialization
+| |-- misc.py						other functions and constants
+| |-- node.py						Node class for building Tree structures
+| |-- terminal.py					Terminal class for VetEOS Terminal
+| |-- utils.py						utility functions
+|-- install_dependencies.py			script for installing dependencies
+|-- main.py							main interface of VetEOS
+|-- requirements.txt				the names of dependencies
+```

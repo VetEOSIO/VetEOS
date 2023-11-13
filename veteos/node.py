@@ -1,3 +1,4 @@
+# for building Tree structures
 class Node():
     def __init__(self, data) -> None:
         self.data = data

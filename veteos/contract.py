@@ -4,6 +4,7 @@ from veteos.core import Func
 from veteos.utils import *
 
 
+# for contract initialization
 class Contract:
     def __init__(self, filename: str) -> None:
         self.filename = filename

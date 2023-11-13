@@ -3,6 +3,7 @@ from veteos.terminal import *
 from veteos.misc import *
 
 
+# main analyzer class
 class Analyzer:
     def ins2str(ins: Instruction, target: str = None):
         def add_note(itp: str):

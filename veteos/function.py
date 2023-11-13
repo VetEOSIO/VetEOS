@@ -4,6 +4,7 @@ from veteos.node import Node
 from veteos.utils import *
 
 
+# for function initialization (WIP)
 class VetFunction(Function):
     def __init__(self, name: str, func: Function, return_values) -> None:
         self.name = name

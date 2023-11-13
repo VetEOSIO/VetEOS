@@ -2,6 +2,7 @@ from veteos.core import *
 import pprint
 
 
+# VetEOS Terminal
 class Terminal():
     def __init__(self) -> None:
         # \u2500: box drawings light horizontal

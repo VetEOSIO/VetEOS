@@ -1,6 +1,7 @@
 from veteos.octopus.arch.wasm.instruction import WasmInstruction
 
 
+# for instruction initialization (WIP)
 class VetInstruction(WasmInstruction):
     """
     VetEOS Instruction
