@@ -1,7 +1,12 @@
 import os
 
+EXM = 'examples/gamble.wasm'  # path of an example
+
 
 class Const:
+    '''
+    define the constants
+    '''
     EOSIO_TOKEN = b'\x80\xcc\x8a\xa4\xb3\xc0\xba\x98\xd5\x00'  # eosio.token
     TRANSFER = b'\x80\x80\x80\xb8\xd5\x85\xcf\xe6M'  # transfer
     ACTIVE = b'\x80\x80\x80\x80\x80\xb5\xbb\x992'  # active
@@ -14,10 +19,10 @@ class Const:
 #         self.msg = msg
 
 
-EXM = 'examples/gamble.wasm'
-
-
 def get_file_list(dir_path: str, ends: str = None) -> list:
+    '''
+    find all files ends with `ends` in `dir_path`
+    '''
     res = []
     dir_files = os.listdir(dir_path)  # get file list
     dir_files.sort()
@@ -31,20 +36,32 @@ def get_file_list(dir_path: str, ends: str = None) -> list:
 
 
 def printl(list: list):
+    '''
+    print a list, one item one line
+    '''
     for i in list:
         print(str(i))
 
 
 def prints(ssa: list):
+    '''
+    print all SSA format instructions in a list
+    '''
     for i in ssa:
         print(i.ssa.format())
 
 
 def printo(obj):
+    '''
+    print all attributes of an object
+    '''
     print('\n'.join(['%s:%s' % item for item in obj.__dict__.items()]))
 
 
 def printdic(dic: dict):
+    '''
+    print a `dict`
+    '''
     sp = ' '
 
     def list2str(lst: list, level: int):

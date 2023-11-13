@@ -4,6 +4,9 @@ from veteos.octopus.arch.wasm.cfg import Function
 
 
 def is_cmp_ins(ins: str):
+    '''
+    check if an instruction is used to comparison
+    '''
     def is_eq(insname: str):
         return '.eq' in insname
 
@@ -25,18 +28,30 @@ def is_cmp_ins(ins: str):
 
 
 def is_load_ins(instr: Instruction) -> bool:
+    '''
+    check if an instruction is 'load'
+    '''
     return 'load' in instr.name
 
 
 def is_store_ins(instr: Instruction) -> bool:
+    '''
+    check if an instruction is 'store'
+    '''
     return 'store' in instr.name
 
 
 def is_call_ins(instr: Instruction) -> bool:
+    '''
+    check if an instruction is 'call'
+    '''
     return 'call' in instr.name
 
 
 def is_constant_ins(instr: Instruction) -> bool:
+    '''
+    check if an instruction is an constant
+    '''
     try:
         return instr.ssa.is_constant
     except:
@@ -44,10 +59,16 @@ def is_constant_ins(instr: Instruction) -> bool:
 
 
 def is_get_local_ins(instr: Instruction) -> bool:
+    '''
+    check if an instruction is 'get_local'
+    '''
     return 'get_local' in instr.name
 
 
 def get_local_global_name(instr: Instruction) -> str:
+    '''
+    get the name of a local or global variable
+    '''
     return instr.operand_interpretation.split('_')[-1]
 
 
@@ -59,10 +80,16 @@ def get_ins_interpretation(ins: Instruction) -> str:
 
 
 def is_db_find(fn: str) -> bool:
+    '''
+    check if an instruction is used to find the table name
+    '''
     return 'db_' in fn and ('find' in fn or 'upperbound' in fn or 'lowerbound' in fn or 'end' in fn)
 
 
 def is_db_store(fn: str) -> bool:
+    '''
+    check if an instruction is writing to a table
+    '''
     return 'db_' in fn and ('store' in fn or 'update' in fn)
 
 
@@ -86,11 +113,17 @@ def eosio_name_decoder(value: int) -> str:
 
 
 def addi(item, list: list):
+    '''
+    add a item to a list if it does not exist in the list
+    '''
     if item not in list:
         list.append(item)
 
 
 def set_dataflow(ins, data: str):
+    '''
+    set the dataflow attribute of an instruction
+    '''
     ins.dataflow = ' [%s]' % data
     '''for i in func.func.instructions:
         if i == ins:

@@ -2,8 +2,11 @@ from veteos.core import *
 import pprint
 
 
-# VetEOS Terminal
 class Terminal():
+    '''
+    VetEOS Terminal
+    '''
+
     def __init__(self) -> None:
         # \u2500: box drawings light horizontal
         # \u2501: box drawings heavy horizontal
@@ -434,6 +437,9 @@ class Terminal():
 
 
 def func_call_tree(emul: Contract):
+    '''
+    generate the function call tree
+    '''
     def find_calls(fn: str) -> list:
         return emul.get_call_edges_from(fn)
 
