@@ -4,8 +4,11 @@ from veteos.node import Node
 from veteos.utils import *
 
 
-# for function initialization (WIP)
 class VetFunction(Function):
+    '''
+    VetEOS Function, for function initialization (WIP)
+    '''
+
     def __init__(self, name: str, func: Function, return_values) -> None:
         self.name = name
         self.func = func

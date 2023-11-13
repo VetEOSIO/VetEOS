@@ -1,8 +1,11 @@
 
 from veteos.analyzer import *
 
-# recursively search a target function called from a function, return the call sequence
+
 def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
+    '''
+    recursively search a target function called from a function, return the call sequence
+    '''
     np = []
     for p in parent:
         np.append(p)
@@ -47,8 +50,10 @@ def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
     return res
 
 
-# analyze the table names from database operation instructions
 def table_name_analysis(emul: Contract, data):
+    '''
+    analyze the table names from database operation instructions
+    '''
     fn = set()
     for path in data:
         for item in path:
@@ -92,9 +97,11 @@ def table_name_analysis(emul: Contract, data):
     return table_dic
 
 
-# analyze the tables name relation between different tables
 @timeout_decorator.timeout(30)
 def table_analysis(emul: Contract, actions: list):
+    '''
+    analyze the tables name relation between different tables
+    '''
     log = ''
     table_paths = []
     for a in actions:
@@ -117,8 +124,10 @@ def table_analysis(emul: Contract, actions: list):
     return res_dic, log
 
 
-# get the name of a table
 def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
+    '''
+    get the name of a table from db_find
+    '''
     # must contain table name in param
     if 'db_find' in ins_name or \
         'db_store' in ins_name or \
@@ -198,10 +207,9 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
             return
 
 
-# print the function call sequence
 def show_func_flow(data: list):
     '''
-    only for visulization
+    only for visulization, print the function call sequence
     '''
     res = ''
     for path in data:

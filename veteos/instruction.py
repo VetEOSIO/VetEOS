@@ -1,11 +1,10 @@
 from veteos.octopus.arch.wasm.instruction import WasmInstruction
 
 
-# for instruction initialization (WIP)
 class VetInstruction(WasmInstruction):
-    """
-    VetEOS Instruction
-    """
+    '''
+    VetEOS Instruction, for instruction initialization (WIP)
+    '''
 
     def __init__(self, opcode, name, imm_struct, operand_size, insn_byte,
                  pops, pushes, description, operand_interpretation=None, offset=0):
