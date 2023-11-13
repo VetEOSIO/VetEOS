@@ -57,7 +57,11 @@ def find_func_source(emul, target: str):
 def get_test_file_list():
     path = 'samples/github'
     files = os.listdir(path)
-    return [os.path.join(path, f) for f in files]
+    res = []
+    for f in files:
+        if f.endswith('.wasm'):
+            res.append(os.path.join(path, f))
+    return res
 
 
 def find_entry(emul):
