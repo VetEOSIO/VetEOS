@@ -5,6 +5,7 @@ from veteos.misc import *
 
 # main analyzer class
 class Analyzer:
+    # convert the instruction to string
     def ins2str(ins: Instruction, target: str = None):
         def add_note(itp: str):
             if '6138663591592764928' in itp:
@@ -27,6 +28,7 @@ class Analyzer:
         itp = add_note(itp)
         return str(ins.offset)+': '+itp
 
+    # find the instruction which calling the function indicated by the function name
     def find_call_ins(emul: Contract, funcname: str, target: str, full: bool = False, index_only: bool = False, reverse: bool = False, start_index: int = 0):
         func = emul.get_function(funcname)
         if func == None:
@@ -49,6 +51,7 @@ class Analyzer:
                         return tmp
         return res if len(res) > 0 else None
 
+    # detect the pay to play patterns (listening "transfer" notification in "apply")
     def pay2play(emul: Contract):
         funcname = 'apply'
         app = emul.get_function(funcname)
@@ -79,6 +82,7 @@ class Analyzer:
                     return res
         return None
 
+    # detect the notify functions
     def notify(emul: Contract):
         def inline_eos_trans(emul: Contract):
             '''
@@ -142,6 +146,7 @@ class Analyzer:
         else:
             return None
 
+    # detect the write and read of global states
     def stateIO(emul: Contract, read: bool = True, full=True):
         def find_db_find(flist: list) -> int:
             for i in range(len(flist)-1, -1, -1):
@@ -219,6 +224,7 @@ class Analyzer:
                 res.append(tmp)
         return res if len(res) > 0 else None
 
+    # detect the condition check of user input and secret
     def checkCondition(emul: Contract):
         def is_get_parameter(ins: Instruction, paran: int) -> bool:
             if 'get_local' in ins.name:
@@ -277,6 +283,7 @@ class Analyzer:
                     return res
         return None
 
+    # detect the secret creation process
     def createSecret(emul: Contract, full=False):
         '''
         similar to rem_ana()
@@ -311,7 +318,9 @@ class Analyzer:
         return None
 
 
+# Analyzer with SSA generation
 class Analyzerssa:
+    # preprocessing of instructions
     def ins_preprocess(func: Func, left, right):
         for i in range(left, right):
             ins = func.func.instructions[i]
@@ -319,6 +328,7 @@ class Analyzerssa:
                 func.set_local_ssa(get_ins_interpretation(ins).split()[-1])
         return func.func.instructions[left:right]
 
+    # convert the instruction to string
     def ins2str(ins: Instruction, target: str = None):
         def add_note(itp: str):
             res = ''
@@ -344,6 +354,7 @@ class Analyzerssa:
         itp += add_note(get_ins_interpretation(ins))
         return str(ins.offset)+': '+itp
 
+    # find the instruction which calling the function indicated by the function name
     def find_call_ins(emul: Contract, funcname: str, target: str, full: bool = False, index_only: bool = False, reverse: bool = False, start_index: int = 0):
         # func=emul.get_function(funcname)
         func = get_func_wrapper(emul, funcname)
@@ -368,6 +379,7 @@ class Analyzerssa:
                         return tmp
         return res if len(res) > 0 else None
 
+    # detect the pay to play patterns (listening "transfer" notification in "apply")
     def pay2play(emul: Contract):
         funcname = 'apply'
         # app=emul.get_function(funcname)
@@ -405,6 +417,7 @@ class Analyzerssa:
                     return res
         return None
 
+    # detect the notify functions
     def notify(emul: Contract):
         def inline_eos_trans(emul: Contract):
             '''
@@ -478,6 +491,7 @@ class Analyzerssa:
         else:
             return None
 
+    # detect the write and read of global states
     def stateIO(emul: Contract, read: bool = True, full=True):
         def find_db_find(flist: list) -> int:
             for i in range(len(flist)-1, -1, -1):
@@ -555,6 +569,7 @@ class Analyzerssa:
                 res.append(tmp)
         return res if len(res) > 0 else None
 
+    # detect the condition check of user input and secret
     def checkCondition(emul: Contract):
         def is_get_parameter(ins: Instruction, paran: int) -> bool:
             if 'get_local' in ins.name:
@@ -619,6 +634,7 @@ class Analyzerssa:
                     return res
         return None
 
+    # detect the secret creation process
     def createSecret(emul: Contract, full=False):
         '''
         similar to rem_ana()
@@ -657,16 +673,19 @@ class Analyzerssa:
         return None
 
 
+# main GDV detection solver
 class Solver:
     def __init__(self, emul: Contract) -> None:
         self.emul = emul
 
+    # convert list to string
     def list2str(self, raw: list, c: str = ':'):
         # if len(raw) == 0:
         #     return ''
         title = raw[0].split(c)[0]+c
         return title+('\l' if not title.endswith('\l') else '') + ('\l'.join(raw)).replace(title, '')
 
+    # convert string to html format
     def str2html(self, s: str, title: str):
         if s.endswith('\l'):
             s = s[:-2]
@@ -678,6 +697,7 @@ class Solver:
         % (fs, title, fs, s.replace('\l', '</font></td></tr><tr><td align="left"><font point-size="%d">' % fs)
            .replace('&lt;', '</font><font point-size="%d" color="orange">&lt;' % fs))
 
+    # wrapper for pay2play detection
     def pay2play_wp(self):
         raw = Analyzer.pay2play(self.emul)
         if raw == None:
@@ -685,12 +705,14 @@ class Solver:
         res = raw['eosio.token']+raw['transfer']
         return self.list2str(res)+'\l'
 
+    # wrapper for checkCondition detection
     def checkCondition_wp(self):
         raw = Analyzer.checkCondition(self.emul)
         if raw == None:
             return 'None'
         return self.list2str(raw)+'\l'
 
+    # wrapper for createSecret detection
     def createSecret_wp(self):
         # only works for 'rem'
         raw = Analyzer.createSecret(self.emul)
@@ -698,6 +720,7 @@ class Solver:
             return 'None'
         return self.list2str(raw)+'\l'
 
+    # wrapper for notify detection
     def notify_wp(self):
         raw = Analyzer.notify(self.emul)
         if raw == None:
@@ -716,6 +739,7 @@ class Solver:
             res += self.list2str([rc[-1]])
         return res+'\l'
 
+    # wrapper for stateIO detection
     def stateIO_wp(self):
         def dic_ana(raw: list):
             '''
@@ -755,6 +779,7 @@ class Solver:
         else:
             return rdd[rddk[0]]+'\l', wtd[wtdk[0]]+'\l', wtd[secret]+'\l'
 
+    # generate analysis summary graph
     def graph_viz(self, filename=None, dump_text=False, dump_graph=True):
         def viz(filename='summary.gv', TB=True):
             from graphviz import Digraph
@@ -863,6 +888,7 @@ class Solver:
         return vul_flag
 
 
+# find a function from the function call tree
 def find_func_from_tree(emul: Contract, target: str, passes: str = None, full: bool = False) -> list:
     def dfs(node: dict, visited: list) -> list:
         res = []
@@ -901,6 +927,7 @@ def find_func_from_tree(emul: Contract, target: str, passes: str = None, full: b
     return res
 
 
+# find a datebase operation function from the function call tree
 def find_db_from_tree(emul: Contract, target: str, full: bool = False) -> list:
     def dfs(node: dict, visited: list) -> list:
         res = []
@@ -939,6 +966,7 @@ def find_db_from_tree(emul: Contract, target: str, full: bool = False) -> list:
     return res
 
 
+# a template for finding a function from the function call tree
 def find_func_from_tree_new(emul: Contract, target: str, passes: str = None, full: bool = False, cmp=lambda t, k: t in k) -> list:
     def dfs(node: dict, visited: list) -> list:
         res = []
