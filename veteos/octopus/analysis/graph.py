@@ -62,7 +62,7 @@ class Graph(object):
                     # the escape sequences "\n", "\l" and "\r"
                     # divide the label into lines, centered,
                     # left-justified, and right-justified, respectively.
-                    print(label)
+                    # print(label)
                     label = label.replace('\n', '\l')
                     # create node
                     c.node(basicblock.name, label=label)
@@ -162,7 +162,7 @@ class CFGGraph(Graph):
                         # the escape sequences "\n", "\l" and "\r"
                         # divide the label into lines, centered,
                         # left-justified, and right-justified, respectively.
-                        print(label)
+                        # print(label)
                         label = label.replace('\n', '\l')
                         # create node
                         c.node(basicblock.name, label=label)

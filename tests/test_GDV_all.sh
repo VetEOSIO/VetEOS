@@ -1,6 +1,13 @@
 #!/bin/bash
 
 directory="samples/allvulnerable"
+zip_file="samples/allvulnerable.tar.gz"
+
+if [ ! -d "$directory" ]; then
+    tar -xzf "$zip_file" -C "samples/"
+    echo "Extracted $zip_file to $directory"
+fi
+
 index=0
 count=0
 total_files=$(find $directory -maxdepth 1 -type f -name "*.wasm" | wc -l)

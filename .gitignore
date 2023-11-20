@@ -118,4 +118,6 @@ testme.*
 
 # Test results
 # results/
+allvulnerable/
+opensource/
 *.wasm.log

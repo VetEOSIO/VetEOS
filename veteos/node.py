@@ -2,6 +2,7 @@ class Node():
     '''
     a node class for building Tree structures
     '''
+
     def __init__(self, data) -> None:
         self.data = data
         self.parents = []

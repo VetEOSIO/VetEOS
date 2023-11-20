@@ -58,7 +58,7 @@ class BasicBlock(object):
                 line += '' + i.ssa.format()
             else:
                 line += '[NO_SSA] ' + i.name
-            if i.dataflow:
+            if hasattr(i, 'dataflow') and i.dataflow:
                 line += ''+i.dataflow
             out += line + '\n'
         return out

@@ -1,5 +1,29 @@
+from veteos.contract import Contract
+from veteos.core import *
+import timeout_decorator
 
-from veteos.analyzer import *
+
+@timeout_decorator.timeout(5)
+def get_func_wrapper(emul: Contract, funcname: str):
+    '''
+    a wrapper function for initialize function
+    '''
+    try:
+        func = emul.get_VetFunction(funcname, True)
+    except:
+        raise TimeoutError("get func timeout: "+funcname)
+    return func
+
+
+@timeout_decorator.timeout(5)
+def get_emul_wrapper(file: str):
+    '''
+    a wrapper function for initialize contract
+    '''
+    try:
+        return Contract(file)
+    except:
+        raise TimeoutError("init Emul timeout")
 
 
 def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
@@ -10,15 +34,14 @@ def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
     for p in parent:
         np.append(p)
     np.append(fname)
-    # print(fname)
-    f = emul.get_function(fname[1])
+    f = emul.get_VetFunction(fname[1], False)
     imports = emul.emul.ana.imports_func
     importn = len(imports)
     exfunc = []
     db_ins = []
-    for i in f.instructions:
-        if i.name == 'call':
-            fid = int(i.operand_interpretation.split()[1])
+    for i in f.get_instructions():
+        if i.is_call_ins:
+            fid = int(i.get_ins_interpretation().split()[1])
             if fid < importn:  # library (import) funcs
                 impn = imports[fid][1]
                 if tar in impn:
@@ -28,12 +51,11 @@ def search_func(emul: Contract, fname: tuple, tar: str, parent: list) -> list:
                 # Done: sometimes function not in import has name
                 # exfn = '$func%d' % fid
                 exfn = emul.get_func_name(fid)
-                # print(exfn)
                 # addi(exfn, exfunc)
                 # same func name possible in different instr
                 exfunc.append((i, exfn))
-    '''if len(db_ins) == 0 and len(exfunc) == 0:
-        return []'''
+    # if len(db_ins) == 0 and len(exfunc) == 0:
+    #     return []
     res = []
     if len(db_ins) != 0:
         res.append(np+[db_ins])
@@ -61,7 +83,7 @@ def table_name_analysis(emul: Contract, data):
                 fn.add(item[1])
     funcs = {}
     for f in fn:
-        funcs[f] = emul.get_Func(f)
+        funcs[f] = emul.get_VetFunction(f, True)
 
     table_dic = {}
     key_read = 'read'
@@ -77,7 +99,7 @@ def table_name_analysis(emul: Contract, data):
             # TODO: error occurred when analyzing 'next', temp skip
             if 'db_next' in n:
                 continue
-            ins = func.instructions[i.offset]
+            ins = func.get_instructions()[i.offset]
             tn = get_table_name(ins, n, path, funcs, emul)
             if tn not in table_dic.keys():
                 table_dic[tn] = {key_write: [], key_read: [], key_io: -1}
@@ -155,8 +177,8 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
         for pi in pre_ins:
             # case 1: 'db_find' in same func
             print(pi.ssa.format())
-            if pi.name == 'call':
-                fid = int(pi.operand_interpretation.split()[1])
+            if pi.is_call_ins:
+                fid = int(pi.get_ins_interpretation().split()[1])
                 if fid < len(emul.emul.ana.imports_func):
                     impn = emul.emul.ana.imports_func[fid][1]
                     if 'db_find' in impn or \
@@ -169,8 +191,8 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
         # case 2: cross function
         source = pre_ins[-1]
         # if cross func, the source should be a local
-        if source.name == 'get_local':
-            para_index = source.operand_interpretation.split()[1]
+        if source.is_get_local_ins:
+            para_index = source.get_ins_interpretation().split()[1]
             print('local', para_index)
             curr_index = len(path)-2
             while curr_index >= 1:
@@ -178,7 +200,7 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
                 parent_func_name = path[curr_index-1][1]
                 parent_call_ins = path[curr_index][0]
                 pfunc = funcs[parent_func_name]
-                pcins = pfunc.instructions[parent_call_ins.offset]
+                pcins = pfunc.get_instructions()[parent_call_ins.offset]
                 # print(pcins.ssa.format())
                 # print(pcins.ssa.args)
                 para_index = len(pcins.ssa.args)-1-para_index
@@ -189,8 +211,8 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
                 pre_para_ins = track_prev_all(para_ins, pfunc)
                 for pi in pre_para_ins:
                     # case 1: 'db_find' in same func
-                    if pi.name == 'call':
-                        fid = int(pi.operand_interpretation.split()[1])
+                    if pi.is_call_ins:
+                        fid = int(pi.get_ins_interpretation().split()[1])
                         # TODO: currently skip all custom functions
                         if fid < len(emul.emul.ana.imports_func):
                             impn = emul.emul.ana.imports_func[fid][1]
@@ -201,8 +223,9 @@ def get_table_name(instr, ins_name: str, path: list, funcs: dict, emul):
                 # case 2: cross function: stay in loop
                 # TODO: is source must last one?
                 para_source = pre_para_ins[-1]
-                if para_source.name == 'get_local':
-                    para_index = para_source.operand_interpretation.split()[1]
+                if para_source.is_get_local_ins:
+                    para_index = para_source.get_ins_interpretation().split()[
+                        1]
                 curr_index -= 1
             return
 
@@ -217,7 +240,7 @@ def show_func_flow(data: list):
         ins = []
         for i, inm in path[-1]:
             ins.append(
-                ': '.join([str(i.offset), i.operand_interpretation, inm]))
+                ': '.join([str(i.offset), i.get_ins_interpretation(), inm]))
         res += '\n'.join([fp]+ins)
         res += '\n'
     print(res)

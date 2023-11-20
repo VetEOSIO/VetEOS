@@ -1,82 +1,4 @@
-
-from veteos.octopus.arch.wasm.instruction import Instruction
-from veteos.octopus.arch.wasm.cfg import Function
-
-
-def is_cmp_ins(ins: str):
-    '''
-    check if an instruction is used to comparison
-    '''
-    def is_eq(insname: str):
-        return '.eq' in insname
-
-    def is_ne(insname: str):
-        return '.ne' in insname and 'neg' not in insname and 'nea' not in insname
-
-    def is_lt(insname: str):
-        return '.lt' in insname
-
-    def is_gt(insname: str):
-        return '.gt' in insname
-
-    def is_le(insname: str):
-        return '.le' in insname
-
-    def is_ge(insname: str):
-        return '.ge' in insname and 'get' not in insname
-    return is_eq(ins) or is_ne(ins) or is_lt(ins) or is_gt(ins) or is_le(ins) or is_ge(ins)
-
-
-def is_load_ins(instr: Instruction) -> bool:
-    '''
-    check if an instruction is 'load'
-    '''
-    return 'load' in instr.name
-
-
-def is_store_ins(instr: Instruction) -> bool:
-    '''
-    check if an instruction is 'store'
-    '''
-    return 'store' in instr.name
-
-
-def is_call_ins(instr: Instruction) -> bool:
-    '''
-    check if an instruction is 'call'
-    '''
-    return 'call' in instr.name
-
-
-def is_constant_ins(instr: Instruction) -> bool:
-    '''
-    check if an instruction is an constant
-    '''
-    try:
-        return instr.ssa.is_constant
-    except:
-        return 'const' in instr.name
-
-
-def is_get_local_ins(instr: Instruction) -> bool:
-    '''
-    check if an instruction is 'get_local'
-    '''
-    return 'get_local' in instr.name
-
-
-def get_local_global_name(instr: Instruction) -> str:
-    '''
-    get the name of a local or global variable
-    '''
-    return instr.operand_interpretation.split('_')[-1]
-
-
-def get_ins_interpretation(ins: Instruction) -> str:
-    '''
-    return the operand_interpretation of an Instruction
-    '''
-    return ins.operand_interpretation if ins.operand_interpretation != None else ins.name
+import os
 
 
 def is_db_find(fn: str) -> bool:
@@ -120,11 +42,77 @@ def addi(item, list: list):
         list.append(item)
 
 
-def set_dataflow(ins, data: str):
+def get_file_list(dir_path: str, ends: str = None) -> list:
     '''
-    set the dataflow attribute of an instruction
+    find all files ends with `ends` in `dir_path`
     '''
-    ins.dataflow = ' [%s]' % data
-    '''for i in func.func.instructions:
-        if i == ins:
-            i.dataflow = ' [%s]' % data'''
+    res = []
+    dir_files = os.listdir(dir_path)  # get file list
+    dir_files.sort()
+    for file in dir_files:
+        file_path = os.path.join(dir_path, file)  # combine path
+        if os.path.isfile(file_path):
+            if ends != None and not file_path.endswith(ends):
+                continue
+            res.append(os.path.abspath(file_path))
+    return res
+
+
+def printl(list: list):
+    '''
+    print a list, one item one line
+    '''
+    for i in list:
+        print(str(i))
+
+
+def prints(ssa: list):
+    '''
+    print all SSA format instructions in a list
+    '''
+    for i in ssa:
+        print(i.ssa.format())
+
+
+def printo(obj):
+    '''
+    print all attributes of an object
+    '''
+    print('\n'.join(['%s:%s' % item for item in obj.__dict__.items()]))
+
+
+def printdic(dic: dict):
+    '''
+    print a `dict`
+    '''
+    sp = ' '
+
+    def list2str(lst: list, level: int):
+        res = '[\n'
+        items = [str(i) for i in lst]
+        res += ',\n'.join(items)
+        res += '\n]'
+        return res
+
+    def dic2str(dic: dict, level: int):
+        res = '{\n'
+        items = []
+        for k in dic.keys():
+            # TODO: level
+            # tmp += sp*level
+            tmp = str(k)+': '
+            if type(dic[k]) == dict:
+                tmp += '\n'
+                tmp += dic2str(dic[k], level+1)
+            elif type(dic[k]) == list:
+                tmp += '\n'
+                tmp += list2str(dic[k], level+1)
+            else:
+                tmp += str(dic[k])
+            items.append(tmp)
+        res += ',\n'.join(items)
+        res += '\n}'
+        return res
+    ret = dic2str(dic, 1)
+    print(ret)
+    return ret

@@ -25,8 +25,8 @@ def main():
             dump_graph = True
         if args.dump:
             dump_text = True
-        from veteos.core import get_emul_wrapper
-        from veteos.analyzer import Solver
+        from veteos.analyses import get_emul_wrapper
+        from veteos.solver import Solver
         emul = get_emul_wrapper(args.file)
         g = Solver(emul)
         g.graph_viz(dump_text=dump_text, dump_graph=dump_graph)

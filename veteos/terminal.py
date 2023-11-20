@@ -1,4 +1,8 @@
+from veteos.instruction import VetInstruction
+from veteos.function import VetFunction
+from veteos.contract import Contract
 from veteos.core import *
+from veteos.misc import *
 import pprint
 
 
@@ -62,11 +66,17 @@ class Terminal():
         res += string+Color.END
         return res
 
-    def get_term_size(self):
+    def get_term_size(self) -> int:
+        '''
+        return the size of terminal
+        '''
         import os
         return os.get_terminal_size().columns
 
-    def get_hbar(self):
+    def get_hbar(self) -> str:
+        '''
+        return a horizontal bar
+        '''
         term_size = self.get_term_size()
         return self.hline*term_size
 
@@ -99,7 +109,7 @@ class Terminal():
                         res[i] = t
             return res
 
-        def ins2str(instr: Instruction, formatter: list = default_formatter) -> str:
+        def ins2str(instr: VetInstruction, formatter: list = default_formatter) -> str:
             '''
             return a formated string of an instruction
             '''
@@ -250,7 +260,7 @@ class Terminal():
         res += hbar
         print(res)
 
-    def func2list(self, func: Func) -> list:
+    def func2list(self, func: VetFunction) -> list:
         '''
         Convert a function to a string list
         '''
@@ -258,15 +268,17 @@ class Terminal():
         for b in func.basicblocks:
             res.append(b.name)
             for i in b.instructions:
+                i = VetInstruction(i)
                 res.append(i)
         return res
 
     def test(self):
-        file = 'examples/gamble.wasm'
+        file = EXAMPLE
         emul = Contract(file)
-        func = emul.get_Func('apply')
-        tar = func.func.instructions
+        func = emul.get_VetFunction('apply')
+        tar = func.vet_instructions
         self.print_ins_list(tar, [0])
+        return emul, func
 
     def run(self):
         def print_fn(fn: str):
@@ -281,6 +293,8 @@ class Terminal():
             return True
 
         def check_func():
+            if not check_emul():
+                return False
             if func == None:
                 print(ERROR+'Please initialize the function.')
                 return False
@@ -318,7 +332,7 @@ class Terminal():
                 break
 
             elif s == 't':
-                self.test()
+                emul, func = self.test()
 
             elif s == 'load':
                 filename = myinput('Please input file path: ')
@@ -346,13 +360,13 @@ class Terminal():
                 if len(func_name.split()) > 1:
                     print(WARNING+'Only accept 1 function name.')
                 try:
-                    func = emul.get_Func(func_name)
+                    func = emul.get_VetFunction(func_name)
                 except:
                     print(ERROR+'Invalid function name: ' +
                           self.set_color(func_name, 'y'))
                     continue
                 ins = []
-                print_fn(func.func.prefered_name)
+                print_fn(func.prefered_name)
                 self.print_ins_list(self.func2list(func))
 
             elif s == 'i' or s.startswith('i '):
@@ -383,7 +397,7 @@ class Terminal():
                 if error:
                     ins = []
                     continue
-                print_fn(func.func.prefered_name)
+                print_fn(func.prefered_name)
                 self.print_ins_list(self.func2list(func), ins)
 
             elif s == 'p':
@@ -392,13 +406,13 @@ class Terminal():
 
                 pre_ins = []
                 for i_offset in ins:
-                    pre = track_prev_one(func.instructions[i_offset])
+                    pre = track_prev_one(func.offset2instr[i_offset])
                     if pre != None:
                         pre_ins += pre
                 ins = []
                 for pi in pre_ins:
                     ins.append(pi.offset)
-                print_fn(func.func.prefered_name)
+                print_fn(func.prefered_name)
                 self.print_ins_list(self.func2list(func), ins)
 
             elif s == 'n':
@@ -408,60 +422,34 @@ class Terminal():
                 next_ins = []
                 for i_offset in ins:
                     nexti = track_next_one(
-                        func.instructions[i_offset], func.func.instructions)
+                        func.offset2instr[i_offset], func.vet_instructions)
                     if nexti != None:
                         next_ins += nexti
                 ins = []
                 for ni in next_ins:
                     ins.append(ni.offset)
-                print_fn(func.func.prefered_name)
+                print_fn(func.prefered_name)
                 self.print_ins_list(self.func2list(func), ins)
 
             elif s == 'fi':
                 if not check_func():
                     continue
-                print_fn(func.func.prefered_name)
+                print_fn(func.prefered_name)
                 self.print_ins_list(self.func2list(func), ins, full=True)
 
-            elif s == 'cg':
+            elif s == 'acg':
                 if not check_emul():
                     continue
-                tree = func_call_tree(emul)
+                tree = emul.get_func_call_tree()
                 res = pprint.pformat(tree)
                 acn = emul.get_actions()
                 for ac in acn:
                     res = res.replace(ac, self.set_color(ac, 'y'))
-                inline = 'send_inline'
-                res = res.replace(inline, self.set_color(inline, 'g'))
+                # inline = 'send_inline'
+                # res = res.replace(inline, self.set_color(inline, 'g'))
                 print(res)
 
-
-def func_call_tree(emul: Contract):
-    '''
-    generate the function call tree
-    '''
-    def find_calls(fn: str) -> list:
-        return emul.get_call_edges_from(fn)
-
-    def find(node: str, visited: list) -> list:
-        next_calls = find_calls(node)
-        if next_calls == None:
-            return
-        node_dic = {}
-        for nc in next_calls:
-            if nc not in visited:
-                node_dic[nc] = find(nc, visited+[nc])
-        return node_dic
-
-    res = {}
-    apply = 'apply'
-    res[apply] = find(apply, [apply])
-    acn = emul.get_actions()
-    app = []
-    if res[apply] != None and len(res[apply]) > 0:
-        app = list(res[apply].keys())
-    for ac in acn:
-        if ac in app:
-            continue
-        res[ac] = find(ac, [ac])
-    return res
+            elif s == 'dfg':
+                if not check_func():
+                    continue
+                emul.dataflow_analysis(func.name)

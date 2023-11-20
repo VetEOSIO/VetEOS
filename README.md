@@ -2,6 +2,8 @@
 
 VetEOS is a state-of-the-art static analysis framework for the “Groundhog Day” Vulnerabilities (GDVs) in EOSIO smart contracts.
 
+Paper: _VETEOS: Statically Vetting EOSIO Contracts for the “Groundhog Day” Vulnerabilities_.
+
 ## Groundhog Day Vulnerability
 
 In a Groundhog Day attack, adversaries can exploit the unique rollback problem in EOSIO contracts to retry executing the same contract code repeatedly with different inputs. With leaked information observed during previous executions, attackers illegally accumulate knowledge about the victim contract, so as to learn how to make illicit profits in a deterministic manner. We detect GDVs based on the following 4 key factors.
@@ -72,6 +74,8 @@ Commands:
 - `n`: jump to the next instruction.
 - `p`: jump to the previous instruction.
 - `fi`: print all instructions in the function.
+- `acg`: print the action call graph.
+- `dfg`: generate the dataflow graph of the function.
 - `q`: exit the VetEOS terminal.
 
 ## Run Test
@@ -104,26 +108,7 @@ Expected Results:
 ```
 Analyzing file: samples/127922358_8_0.wasm (1/24)
 Analyzing file: samples/127926023_31_0.wasm (2/24)
-Analyzing file: samples/127926269_6_0.wasm (3/24)
-Analyzing file: samples/153965273_9_0.wasm (4/24)
-Analyzing file: samples/209093393_2_0.wasm (5/24)
-Analyzing file: samples/30758713_14_0.wasm (6/24)
-Analyzing file: samples/31645645_29_0.wasm (7/24)
-Analyzing file: samples/63459288_16_0.wasm (8/24)
-Analyzing file: samples/63464623_4_0.wasm (9/24)
-Analyzing file: samples/63467919_7_0.wasm (10/24)
-Analyzing file: samples/63914559_23_0.wasm (11/24)
-Analyzing file: samples/63944572_37_0.wasm (12/24)
-Analyzing file: samples/63946053_12_0.wasm (13/24)
-Analyzing file: samples/63946568_11_0.wasm (14/24)
-Analyzing file: samples/64243784_23_0.wasm (15/24)
-Analyzing file: samples/66017822_10_0.wasm (16/24)
-Analyzing file: samples/69973977_37_0.wasm (17/24)
-Analyzing file: samples/70312874_5_0.wasm (18/24)
-Analyzing file: samples/72430415_4_0.wasm (19/24)
-Analyzing file: samples/72583065_10_0.wasm (20/24)
-Analyzing file: samples/72602858_11_0.wasm (21/24)
-Analyzing file: samples/72603478_10_0.wasm (22/24)
+...
 Analyzing file: samples/76382615_19_0.wasm (23/24)
 Analyzing file: samples/88160916_2_0.wasm (24/24)
 Total number of files analyzed: 24
@@ -174,7 +159,7 @@ Expected Results:
 
 ### Analysis Accuracy Test
 
-Note that accuracy tests requires manual verification against the source code, this test only automatically generates logs. The source code of the tested samples can be found in `./samples/github/source.zip`.
+Note that accuracy tests requires manual verification against the source code, this test only automatically generates logs. The source code of the tested samples can be found in `./samples/sourcecode.tar.gz`.
 
 #### Entry Point Detection Test
 
@@ -186,6 +171,7 @@ Expected Results:
 
 ```
 ...
+>>>results:
 samples:98
 error:0
 ```
@@ -200,7 +186,12 @@ Expected Results:
 
 ```
 ...
-df cases:537
+>>>results:
+dataflow false positive test:
+test cases:537
+error:0
+dataflow false negative test:
+test cases:537
 error:0
 ```
 
@@ -209,8 +200,9 @@ error:0
 ```
 |-- results/                        test results and example outputs
 |-- samples/                        vulerable contract samples
-| |-- allvulerable/                 all 735 vulerable samples
-| |-- github/                       98 open-source vulerable samples
+| |-- allvulnerable.tar.gz          735 vulerable samples
+| |-- opensource.tar.gz             98 open-source vulerable samples
+| |-- sourcecode.tar.gz             source code of the 98 open-source samples
 |-- tests/                          test scripts
 | |-- commands.txt                  commands for VetEOS Terminal Test
 | |-- test_dataflow.sh              cript for Dataflow Analysis Test
@@ -221,13 +213,15 @@ error:0
 |-- veteos/                         core code of VetEOS
 | |-- octopus/                      Octopus libraries
 | |-- analyses.py                   secondary analysis algorithms
-| |-- analyzer.py                   main analyzer class
+| |-- analyzer.py                   Analyzer class for GDV analysis
 | |-- contract.py                   Contract class for contract initialization
 | |-- core.py                       core analysis algorithms
 | |-- function.py                   VetFunction class for function initialization
 | |-- instruction.py                VetInstruction class for instruction initialization
 | |-- misc.py                       other functions and constants
 | |-- node.py                       Node class for building Tree structures
+| |-- solver.py                     Solver class for GDV detection
+| |-- ssa.py                        SSAnode class for SSA data structure
 | |-- terminal.py                   Terminal class for VetEOS Terminal
 | |-- utils.py                      utility functions
 |-- install_dependencies.py         script for installing dependencies

@@ -29,7 +29,6 @@ class WasmInstruction(Instruction):
         self.imm_struct = imm_struct
         self.xref = list()
         self.ssa = None
-        self.dataflow = None
 
     def __eq__(self, other):
         """ Instructions are equal if all features match  """
